@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
+import asafLogo from "@/assets/asaf-logo.png";
 
 const Header = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -36,12 +37,13 @@ const Header = () => {
         >
           <div className="container px-6 md:px-8">
             <div className="flex items-center justify-between h-16">
-              {/* Logo/Name */}
-              <Link 
-                to="/" 
-                className="font-display text-lg font-bold text-foreground hover:text-primary transition-colors"
-              >
-                Asaf Silner
+              {/* Logo */}
+              <Link to="/" className="flex items-center">
+                <img 
+                  src={asafLogo} 
+                  alt="Asaf Silner" 
+                  className="h-8 w-auto hover:opacity-80 transition-opacity"
+                />
               </Link>
 
               {/* Navigation Links */}
