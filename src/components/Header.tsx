@@ -63,7 +63,7 @@ const Header = () => {
                       About
                     </button>
                     <a
-                      href="mailto:asaf@example.com"
+                      href="mailto:asafsilner@gmail.com"
                       className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
                     >
                       Contact
@@ -78,7 +78,7 @@ const Header = () => {
                       Home
                     </Link>
                     <a
-                      href="mailto:asaf@example.com"
+                      href="mailto:asafsilner@gmail.com"
                       className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
                     >
                       Contact
