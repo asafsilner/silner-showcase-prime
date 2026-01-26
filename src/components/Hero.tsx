@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowDown, Mail } from "lucide-react";
+import { ArrowDown, Mail, Linkedin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Hero = () => {
@@ -89,9 +89,33 @@ const Hero = () => {
               size="lg"
               className="border-border hover:border-primary hover:text-primary px-8 py-6 text-base"
             >
-              <a href="mailto:asaf@example.com">
+              <a href="mailto:asafsilner@gmail.com">
                 <Mail className="mr-2 w-4 h-4" />
-                Contact
+                Email
+              </a>
+            </Button>
+            
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-border hover:border-primary hover:text-primary px-6 py-6 text-base"
+            >
+              <a href="https://linkedin.com/in/asafsilner" target="_blank" rel="noopener noreferrer">
+                <Linkedin className="mr-2 w-4 h-4" />
+                LinkedIn
+              </a>
+            </Button>
+            
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="border-border hover:border-primary hover:text-primary px-6 py-6 text-base"
+            >
+              <a href="https://wa.me/9720508822828" target="_blank" rel="noopener noreferrer">
+                <MessageCircle className="mr-2 w-4 h-4" />
+                WhatsApp
               </a>
             </Button>
           </motion.div>
