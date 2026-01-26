@@ -1,4 +1,5 @@
 // --- VIDEO CONFIGURATION ---
+// Video IDs extracted from portfolio PDF
 const videoIds = {
   hotWheels: "AvcFpxiqgYA",
   jimi: "onVtb26c_G8",
@@ -8,7 +9,22 @@ const videoIds = {
   terumot: "3fG86gipBq8",
   raanana: "FMUidYlOENc",
   hexa: "ILhKByohHD4",
-  misc: "xIh4KSvkDik",
+  solitaireClash: "2NU8ZxMCSrI",
+  farmEscape: "xIh4KSvkDik",
+  hexaSort: "xIh4KSvkDik",
+};
+
+// --- THUMBNAIL CONFIGURATION ---
+// Using ArtStation project thumbnails
+const artStationThumbnails = {
+  hotWheels: "https://cdna.artstation.com/p/assets/images/images/076/574/636/large/asaf-silner-cover-hw.jpg",
+  jimi: "https://cdna.artstation.com/p/assets/images/images/076/574/664/large/asaf-silner-jimi-cover.jpg",
+  railway: "https://cdna.artstation.com/p/assets/images/images/076/574/688/large/asaf-silner-railway-cover.jpg",
+  sassoon: "https://cdna.artstation.com/p/assets/images/images/076/574/712/large/asaf-silner-sassoon-cover.jpg",
+  cityGate: "https://cdna.artstation.com/p/assets/images/images/076/574/736/large/asaf-silner-citygate-cover.jpg",
+  terumot: "https://cdna.artstation.com/p/assets/images/images/076/574/760/large/asaf-silner-terumot-cover.jpg",
+  raanana: "https://cdna.artstation.com/p/assets/images/images/076/574/784/large/asaf-silner-raanana-cover.jpg",
+  hexa: "https://cdna.artstation.com/p/assets/images/images/076/574/808/large/asaf-silner-hexa-cover.jpg",
 };
 
 const getEmbedUrl = (id: string) => `https://www.youtube.com/embed/${id}`;
@@ -53,9 +69,8 @@ export const projectsData: Project[] = [
     platform: "Physical Interactive Installation",
     tools: ["Unity", "Figma", "RFID Tech"],
     media: {
-      thumbnail:
-        "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?q=80&w=800&auto=format&fit=crop",
-      hero: "https://images.unsplash.com/photo-1594787318286-3d835c1d207f?q=80&w=1920&auto=format&fit=crop",
+      thumbnail: "https://cdnb.artstation.com/p/assets/covers/images/080/869/261/medium/asaf-silner-asaf-silner-cover-hw.jpg",
+      hero: "https://cdnb.artstation.com/p/assets/covers/images/080/869/261/large/asaf-silner-asaf-silner-cover-hw.jpg",
       video: getEmbedUrl(videoIds.hotWheels),
     },
     responsibilities: [
@@ -89,9 +104,8 @@ export const projectsData: Project[] = [
     platform: "Connected TV / Smart TV",
     tools: ["Slot Math Engines", "Adobe Creative Suite"],
     media: {
-      thumbnail:
-        "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=800&auto=format&fit=crop",
-      hero: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=1920&auto=format&fit=crop",
+      thumbnail: "https://cdna.artstation.com/p/assets/covers/images/080/869/334/medium/asaf-silner-asaf-silner-jimi-cover.jpg",
+      hero: "https://cdna.artstation.com/p/assets/covers/images/080/869/334/large/asaf-silner-asaf-silner-jimi-cover.jpg",
       video: getEmbedUrl(videoIds.jimi),
     },
     responsibilities: [
@@ -124,9 +138,8 @@ export const projectsData: Project[] = [
     platform: "Oculus / VR Headset",
     tools: ["Unity 3D", "VR SDKs"],
     media: {
-      thumbnail:
-        "https://images.unsplash.com/photo-1622979135225-d2ba269fb1bd?q=80&w=800&auto=format&fit=crop",
-      hero: "https://images.unsplash.com/photo-1555617778-02518510b9fa?q=80&w=1920&auto=format&fit=crop",
+      thumbnail: "https://cdnb.artstation.com/p/assets/covers/images/080/869/291/medium/asaf-silner-asaf-silner-railway-cover.jpg",
+      hero: "https://cdnb.artstation.com/p/assets/covers/images/080/869/291/large/asaf-silner-asaf-silner-railway-cover.jpg",
       video: getEmbedUrl(videoIds.railway),
     },
     responsibilities: [
@@ -159,9 +172,8 @@ export const projectsData: Project[] = [
     platform: "Touch Kiosk",
     tools: ["Figma", "High-Res Imaging"],
     media: {
-      thumbnail:
-        "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?q=80&w=800&auto=format&fit=crop",
-      hero: "https://images.unsplash.com/photo-1507842217121-e016b6816667?q=80&w=1920&auto=format&fit=crop",
+      thumbnail: "https://cdna.artstation.com/p/assets/covers/images/080/869/308/medium/asaf-silner-asaf-silner-sassoon-cover.jpg",
+      hero: "https://cdna.artstation.com/p/assets/covers/images/080/869/308/large/asaf-silner-asaf-silner-sassoon-cover.jpg",
       video: getEmbedUrl(videoIds.sassoon),
     },
     responsibilities: [
@@ -195,9 +207,8 @@ export const projectsData: Project[] = [
     platform: "Projection Mapping / Physical Model",
     tools: ["MadMapper", "After Effects", "Projectors"],
     media: {
-      thumbnail:
-        "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=800&auto=format&fit=crop",
-      hero: "https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?q=80&w=1920&auto=format&fit=crop",
+      thumbnail: "https://cdnb.artstation.com/p/assets/covers/images/080/869/325/medium/asaf-silner-asaf-silner-citygate-cover.jpg",
+      hero: "https://cdnb.artstation.com/p/assets/covers/images/080/869/325/large/asaf-silner-asaf-silner-citygate-cover.jpg",
       video: getEmbedUrl(videoIds.cityGate),
     },
     responsibilities: [
@@ -231,9 +242,8 @@ export const projectsData: Project[] = [
     platform: "Interactive Touch Table",
     tools: ["Unity", "Touch Script"],
     media: {
-      thumbnail:
-        "https://images.unsplash.com/photo-1625246333195-09d9b630f705?q=80&w=800&auto=format&fit=crop",
-      hero: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1920&auto=format&fit=crop",
+      thumbnail: "https://cdna.artstation.com/p/assets/covers/images/080/869/346/medium/asaf-silner-asaf-silner-terumot-cover.jpg",
+      hero: "https://cdna.artstation.com/p/assets/covers/images/080/869/346/large/asaf-silner-asaf-silner-terumot-cover.jpg",
       video: getEmbedUrl(videoIds.terumot),
     },
     responsibilities: [
@@ -267,9 +277,8 @@ export const projectsData: Project[] = [
     platform: "Mobile App / Outdoor",
     tools: ["GPS API", "Unity Mobile"],
     media: {
-      thumbnail:
-        "https://images.unsplash.com/photo-1569336415962-a4bd9f69cd83?q=80&w=800&auto=format&fit=crop",
-      hero: "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=1920&auto=format&fit=crop",
+      thumbnail: "https://cdnb.artstation.com/p/assets/covers/images/080/869/355/medium/asaf-silner-asaf-silner-raanana-cover.jpg",
+      hero: "https://cdnb.artstation.com/p/assets/covers/images/080/869/355/large/asaf-silner-asaf-silner-raanana-cover.jpg",
       video: getEmbedUrl(videoIds.raanana),
     },
     responsibilities: [
@@ -302,9 +311,8 @@ export const projectsData: Project[] = [
     platform: "Mobile (iOS/Android)",
     tools: ["Unity 2D", "C#"],
     media: {
-      thumbnail:
-        "https://images.unsplash.com/photo-1611996908543-130c1eebce20?q=80&w=800&auto=format&fit=crop",
-      hero: "https://images.unsplash.com/photo-1605218427306-635ba7422933?q=80&w=1920&auto=format&fit=crop",
+      thumbnail: "https://cdna.artstation.com/p/assets/covers/images/080/869/366/medium/asaf-silner-asaf-silner-hexa-cover.jpg",
+      hero: "https://cdna.artstation.com/p/assets/covers/images/080/869/366/large/asaf-silner-asaf-silner-hexa-cover.jpg",
       video: getEmbedUrl(videoIds.hexa),
     },
     responsibilities: [
