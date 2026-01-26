@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowDown, Mail, Linkedin, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import profileAvatar from "@/assets/profile-avatar.webp";
 
 const Hero = () => {
   const scrollToWork = () => {
@@ -29,15 +31,17 @@ const Hero = () => {
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="max-w-4xl mx-auto text-center"
         >
-          {/* Name badge */}
+          {/* Profile Avatar */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-full border border-border bg-card/50 backdrop-blur-sm"
+            className="mb-8"
           >
-            <span className="w-2 h-2 rounded-full bg-primary animate-pulse-gold" />
-            <span className="text-sm font-medium text-muted-foreground">Asaf Silner</span>
+            <Avatar className="w-32 h-32 md:w-40 md:h-40 mx-auto ring-4 ring-primary/20 ring-offset-4 ring-offset-background shadow-2xl">
+              <AvatarImage src={profileAvatar} alt="Asaf Silner" className="object-cover" />
+              <AvatarFallback className="text-2xl font-bold bg-primary text-primary-foreground">AS</AvatarFallback>
+            </Avatar>
           </motion.div>
 
           {/* Main headline */}
