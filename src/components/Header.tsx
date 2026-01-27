@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
-import asafLogo from "@/assets/asaf-logo.png";
+import asafLogo from "@/assets/asaf-logo.svg";
 
 const Header = () => {
   const [isVisible, setIsVisible] = useState(false);
