@@ -50,11 +50,8 @@ const Hero = () => {
 
           {/* Main headline */}
           <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-6">
-            <span className="text-foreground my-[36px]">Asaf Silner
-Game Designer</span>
-            <span className="text-muted-foreground"> / </span>
-            <br className="hidden md:block" />
-            <span className="text-gold-gradient">Creative Technologist</span>
+            <span className="text-foreground block mb-2">Asaf Silner</span>
+            <span className="text-gold-gradient">Executive Creative Director</span>
           </h1>
 
           {/* Sub-headline */}
