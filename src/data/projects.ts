@@ -6,7 +6,7 @@ const videoIds = {
   railway: "6gyztnIyBtw",
   sassoon: "w2IEXt6ldvo",
   cityGate: "tbN8tKp_ZBA",
-  terumot: "3fG86gipBq8",
+  terumot: "yA6MRps2OKs",
   raanana: "FMUidYlOENc",
   hexa: "ILhKByohHD4",
   solitaireClash: "2NU8ZxMCSrI",
