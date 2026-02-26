@@ -1,17 +1,16 @@
 // --- VIDEO CONFIGURATION ---
 // Video IDs extracted from portfolio PDF
 const videoIds = {
-  hotWheels: "AvcFpxiqgYA",
+  hotWheels: "VH-5zhuq2Sg",
   jimi: "onVtb26c_G8",
-  railway: "6gyztnIyBtw",
-  sassoon: "w2IEXt6ldvo",
-  cityGate: "tbN8tKp_ZBA",
+  railway: "VsAp6-pCoWA",
+  sassoon: "B29zta5f7cQ",
+  cityGate: "UFoLT62cD1Q",
   terumot: "yA6MRps2OKs",
-  raanana: "FMUidYlOENc",
-  hexa: "ILhKByohHD4",
-  solitaireClash: "2NU8ZxMCSrI",
-  farmEscape: "xIh4KSvkDik",
-  hexaSort: "xIh4KSvkDik",
+  raanana: "BVJcH0Z3xVI",
+  hexa: "qBQM4uPF01U",
+  solitaireClash: "F8jNC3Ojw1s",
+  farmEscape: "Jk_xOoj9m0g",
 };
 
 // --- THUMBNAIL CONFIGURATION ---
@@ -62,46 +61,46 @@ export const projectsData: Project[] = [
   {
     id: "hot-wheels",
     title: "Hot Wheels Champion Experience",
-    tagline: "Interactive immersive exhibition for a global brand.",
-    role: "Art Director / Game Designer",
-    team: "Multidisciplinary (3D, Dev, Production)",
+    tagline: "Art Direction, Game & Interface Design for a 16,000 sq ft entertainment complex.",
+    role: "Art Director & Lead Game/Interface Designer",
+    team: "Creative Labs Israel",
     duration: "12 Months",
     platform: "Physical Interactive Installation",
-    tools: ["Unity", "Figma", "RFID Tech"],
+    tools: ["Unity", "RFID", "Kinect", "LiDAR", "IR Cameras", "Arduino"],
     media: {
       thumbnail: projectImages.hotWheels,
       hero: projectImages.hotWheels,
       video: getEmbedUrl(videoIds.hotWheels),
     },
     responsibilities: [
-      "Directed the visual language and user interface for physical stations.",
-      "Designed gamified interactions for physical toy integration.",
-      "Managed the flow of large visitor groups through stations.",
-      "Collaborated with Mattel on brand compliance and asset usage.",
+      "Led the creative vision for a 16,000 sq ft entertainment complex in Virginia.",
+      "Designed 12 interactive physical-digital experiences.",
+      "Integrated RFID wristbands to track visitor progress across stations.",
+      "Built a custom AI+AR system generating personalized souvenir videos for each guest.",
     ],
     content: {
       problem:
-        "Translating the high-octane energy of Hot Wheels into a physical space where kids can actively participate, not just watch.",
+        "Translating the high-octane energy of Hot Wheels into a physical space where kids can actively participate across 12 stations.",
       solution:
-        "Created a 'Phygital' loop where physical RFID bands track progress across digital mini-game stations, culminating in a personalized champion ceremony.",
+        "Created a 'Phygital' ecosystem with RFID wristbands tracking progress across digital mini-game stations, using Unity, 100+ local servers, Kinect sensors, LiDAR, IR cameras, and Arduino controllers.",
       coreLoop:
-        "Scan Band -> Play Physical/Digital Minigame -> Earn Points -> Unlock Virtual Car Parts.",
+        "Scan Band -> Play Physical/Digital Minigame -> Earn Points -> Unlock Badges -> Personalized AI+AR Souvenir Video.",
       systems:
-        "Progression: Session-based economy where performance unlocks visual rewards on the main leaderboard.",
+        "Technology: Over 100 servers, Unity, Kinect, LiDAR, IR cameras, Arduino controllers, and RFID integration.",
       uxFlow:
-        "Onboarding Station -> Challenge Zones (Speed, Power, Crashing) -> Final Leaderboard Reveal.",
+        "Stadium Welcome -> Challenge Zones (Speed Machines, Smash Champs, Track Builders, etc.) -> RFID Badge Collection Hub -> AI+AR Souvenir Video.",
       outcome:
-        "Successfully launched widely attended touring exhibition with high replay value per station.",
+        "Successfully launched a 16,000 sq ft entertainment complex with 12 interactive experiences and zero technical downtime.",
     },
   },
   {
     id: "jimi-hendrix",
     title: "Jimi Hendrix™ Experience",
-    tagline: "Connected TV Slots Game blending music and math.",
-    role: "Game Designer",
-    team: "Studio Team",
+    tagline: "Connected TV Slots Game — the first licensed Jimi Hendrix game for Connected TV.",
+    role: "Game Designer & Producer",
+    team: "PlayWorks Digital",
     duration: "6 Months",
-    platform: "Connected TV / Smart TV",
+    platform: "Connected TV / Roku",
     tools: ["Slot Math Engines", "Adobe Creative Suite"],
     media: {
       thumbnail: projectImages.jimi,
@@ -109,33 +108,33 @@ export const projectsData: Project[] = [
       video: getEmbedUrl(videoIds.jimi),
     },
     responsibilities: [
-      "Designed the core slot mechanics and bonus features.",
-      "Integrated musical cues with gameplay wins (Audio-Reactive Design).",
-      "Optimized UI for '10-foot experience' (TV Remote navigation).",
-      "Balanced the Volatility Index for extended play sessions.",
+      "Led development of a Connected TV slots game celebrating Jimi Hendrix.",
+      "Designed special symbols, progressive jackpots, and photo collection mechanic.",
+      "Oversaw game design and production timelines for Roku release.",
+      "Created a purple-dominant 'Purple Haze' visual aesthetic.",
     ],
     content: {
       problem:
-        "Creating a slot game that respects the legendary IP while delivering modern engagement metrics on limited TV hardware.",
+        "Creating the first licensed Jimi Hendrix game for Connected TV, reaching over 250 million Roku households.",
       solution:
-        "Built the 'Psychedelic Spin' feature where game states trigger famous guitar riffs, making the audio a reward in itself.",
+        "Built a slots game with special symbols, progressive jackpots, and a collector mechanic where players unlock unreleased concert photos as they level up.",
       coreLoop:
-        "Spin -> Symbol Match (Audio Feedback) -> Trigger Bonus Stage (Guitar Solo Mode) -> Win.",
+        "Spin -> Symbol Match -> Trigger Progressive Jackpot -> Unlock Rare Concert Photos -> Level Up.",
       systems:
-        "Math: High volatility model to match the energetic nature of the music.",
-      uxFlow: "Bet Selection -> Spin -> Big Win Celebration -> Feature Trigger.",
+        "Collection: Players unlock unreleased concert photos as they level up, adding collector motivation on top of typical slot mechanics.",
+      uxFlow: "Bet Selection -> Spin -> Big Win Celebration -> Photo Collection -> Feature Trigger.",
       outcome:
-        "Delivered a high-retention game that stands out in the crowded social casino market.",
+        "Released on Roku to over 250 million households as the first licensed Jimi Hendrix game on a Connected TV platform.",
     },
   },
   {
     id: "vr-railway",
-    title: "Israel Railway VR Safety",
-    tagline: "Virtual Reality simulation for safety training.",
-    role: "Lead Designer",
-    team: "Small VR Squad",
+    title: "VR Railway Walk",
+    tagline: "VR safety training experience for Israel Railways — portable and immersive.",
+    role: "Art Director, Game Designer, Production Manager",
+    team: "VR Squad",
     duration: "4 Months",
-    platform: "Oculus / VR Headset",
+    platform: "VR Headset",
     tools: ["Unity 3D", "VR SDKs"],
     media: {
       thumbnail: projectImages.railway,
@@ -143,31 +142,31 @@ export const projectsData: Project[] = [
       video: getEmbedUrl(videoIds.railway),
     },
     responsibilities: [
-      "Designed realistic scenarios for safety hazards.",
-      "Implemented 'Fail States' that teach without traumatizing.",
-      "Created intuitive VR controls for non-gamer employees.",
-      "Mapped spatial audio for hazard awareness.",
+      "Directed art and designed gameplay for VR safety training simulation.",
+      "Replicated railway infrastructure: tracks, stations, platforms, and level crossings.",
+      "Built the project in Unity running at 90–120 FPS.",
+      "Designed a portable system that can be packed and transported to any location.",
     ],
     content: {
       problem:
-        "Safety briefings are boring and often ignored. The goal was to create visceral 'muscle memory' for dangerous situations without real risk.",
+        "Safety briefings are boring and often ignored. The goal was to create interactive training for dangerous railway situations without real risk.",
       solution:
-        "A 'Walk the Line' simulator where users must identify defects and dodge oncoming trains in a hyper-realistic environment.",
+        "A VR simulation replicating railway infrastructure — tracks, stations, platforms, and level crossings — allowing employees to learn safety protocols interactively.",
       coreLoop:
-        "Inspect Track -> Spot Hazard -> Mark/Report -> Avoid Danger -> Debrief.",
-      systems: "Scoring: Penalties for missed checks vs. speed of completion.",
+        "Enter VR -> Navigate Railway Environment -> Identify Hazards -> Follow Safety Protocol -> Debrief.",
+      systems: "Performance: Unity-based, running at 90–120 FPS. Fully portable system.",
       uxFlow:
-        "Gear Up (VR Tutorial) -> Scenario Start -> Hazard Event -> Success/Fail Screen.",
+        "VR Tutorial -> Scenario Start -> Hazard Event -> Safety Protocol -> Success/Fail Screen.",
       outcome:
-        "Adopted as a core training module for safety week, significantly increasing engagement compared to PowerPoint presentations.",
+        "Adopted as a core training module for Israel Railways Safety Week. Portable system deployable to any location.",
     },
   },
   {
     id: "sassoon-codex",
-    title: "Sassoon Codex Interactive",
-    tagline: "Digital stand for one of the world's oldest bibles.",
-    role: "UX/UI Designer",
-    team: "Curators & Devs",
+    title: "The Sassoon Codex Bible",
+    tagline: "Interactive digital stand for a 10th-century manuscript with 792 parchment pages.",
+    role: "Art Director, UX/UI, Studio Manager",
+    team: "ANU Museum",
     duration: "3 Months",
     platform: "Touch Kiosk",
     tools: ["Figma", "High-Res Imaging"],
@@ -177,66 +176,66 @@ export const projectsData: Project[] = [
       video: getEmbedUrl(videoIds.sassoon),
     },
     responsibilities: [
-      "Created a zoomable interface for ultra-high-res manuscripts.",
-      "Designed accessible navigation for diverse museum visitors.",
-      "Structured the information architecture for historical context.",
-      "Ensured zero-latency interactions on large touch screens.",
+      "Created an interactive digital display for the Sassoon Codex (~10th century, 792 pages).",
+      "Designed a digital magnifying glass and chapter navigation system.",
+      "Built bilingual interface supporting Hebrew and English.",
+      "Ensured visitors can examine details invisible on the physical manuscript.",
     ],
     content: {
       problem:
-        "How to let visitors 'touch' and explore a fragile, priceless artifact without damaging it.",
+        "How to let visitors 'touch' and explore a fragile, priceless 10th-century manuscript without damaging it.",
       solution:
-        "A deep-zoom interface that allows users to see texture details invisible to the naked eye, overlaid with translated commentary.",
+        "A touch screen interface with a digital magnifying glass, chapter navigation, and bilingual support — allowing visitors to examine details they cannot see on the physical manuscript inside the museum case.",
       coreLoop:
-        "Select Page -> Deep Zoom -> Toggle Translation Overlay -> Discover Fact.",
+        "Select Page -> Flip Through -> Digital Magnifying Glass -> Chapter Navigation -> Switch Language.",
       systems:
-        "Navigation: Breadcrumb system to prevent users from getting lost in deep zoom levels.",
+        "Navigation: Bible book navigation with bilingual (Hebrew/English) support.",
       uxFlow:
-        "Attract Mode -> Language Select -> Book View -> Detail View -> Reset.",
+        "Attract Mode -> Language Select -> Book View -> Magnifying Glass Detail -> Reset.",
       outcome:
-        "Allowed thousands of visitors to intimately explore the text during its limited exhibition window.",
+        "Allowed thousands of visitors to intimately explore the 792-page manuscript during its exhibition at ANU Museum.",
     },
   },
   {
     id: "city-gate-midba",
     title: "City Gate & Midba Map",
-    tagline: "Immersive projection mapping experience for tourism.",
-    role: "Creative Technologist",
-    team: "Architects & 3D Artists",
+    tagline: "Immersive projection mapping on the ancient stone walls of Jerusalem.",
+    role: "Art Director",
+    team: "Projection & 3D Artists",
     duration: "5 Months",
-    platform: "Projection Mapping / Physical Model",
-    tools: ["MadMapper", "After Effects", "Projectors"],
+    platform: "Projection Mapping / Physical Walls",
+    tools: ["Multi-Projector Mapping", "After Effects", "Sound Design"],
     media: {
       thumbnail: projectImages.cityGate,
       hero: projectImages.cityGate,
       video: getEmbedUrl(videoIds.cityGate),
     },
     responsibilities: [
-      "Mapped digital content onto a complex 3D physical city model.",
-      "Synchronized audio-visual storytelling with lighting cues.",
-      "Designed the visitor attention flow across the large exhibit.",
-      "Solved technical constraints of projector placement and shadows.",
+      "Directed immersive projection mapping on the ancient stone walls of Jerusalem.",
+      "Designed two themes: Jerusalem City Gate (Jaffa Gate excavations) and Madaba Map (6th-century mosaic).",
+      "Used precise multi-projector mapping for wall curvature, niches, and towers.",
+      "Created a language-independent experience relying on sound and visuals rather than text.",
     ],
     content: {
       problem:
-        "Static city models are impressive but fail to tell the dynamic history and future of the urban landscape.",
+        "Ancient stone walls are static surfaces that fail to convey the rich history of Jerusalem's defense, trade, and culture.",
       solution:
-        "Created a 'Living Model' where the physical surface becomes a canvas for historical data, traffic flows, and future plans.",
+        "Projected two immersive themes onto the walls: the Jerusalem City Gate based on excavations under Jaffa Gate, and the Madaba Map — the oldest mosaic map of the Holy Land from the 6th century.",
       coreLoop:
-        "Visitor Arrival -> Audio Intro -> Model Highlights Areas -> Deep Dive Animation -> Full City Illumination.",
+        "Visitor Arrival -> Audio-Visual Intro -> Animated Mosaic/Gate History -> Cultural Deep Dive -> Full Wall Illumination.",
       systems:
-        "Sync: Timecode-based trigger system integrating lighting, sound, and video.",
+        "Multi-projector mapping accounting for wall curvature, niches, and towers. Language-independent (sound + visuals only).",
       uxFlow:
-        "Passive Viewing -> Focused Highlight (Spotlight) -> Broad Context (Full Map) -> Conclusion.",
+        "Passive Viewing -> Gate History Animation -> Madaba Map Mosaic -> Byzantine Highlights -> Conclusion.",
       outcome:
-        "Transformed a static waiting room model into a flagship attraction for the visitors' center.",
+        "Brought the history of defense, trade, and culture to life on Jerusalem's ancient stone walls, accessible to visitors regardless of language.",
     },
   },
   {
     id: "terumot-maasrot",
     title: "Terumot and Ma'asrot",
-    tagline: "Gamifying complex agricultural laws for a museum audience.",
-    role: "Game Designer",
+    tagline: "Interactive educational experience teaching children complex Jewish agricultural laws.",
+    role: "Game & Art Producer, Creative Manager",
     team: "Educational Staff & Devs",
     duration: "4 Months",
     platform: "Interactive Touch Table",
@@ -247,16 +246,16 @@ export const projectsData: Project[] = [
       video: getEmbedUrl(videoIds.terumot),
     },
     responsibilities: [
-      "Translated ancient agricultural texts into simple game rules.",
-      "Designed a collaborative multi-user interface for the table.",
-      "Balanced the difficulty for mixed-age groups (family play).",
-      "Created visual metaphors for separating crops (Tithes).",
+      "Produced an interactive educational project teaching children about agricultural laws.",
+      "Translated ancient agricultural texts into accessible game mechanics.",
+      "Designed collaborative multi-user interface for touch table.",
+      "Balanced difficulty for mixed-age groups (family play).",
     ],
     content: {
       problem:
-        "The laws of 'Terumot and Ma'asrot' are abstract and mathematical, making them dry and difficult for kids to grasp.",
+        "The laws of 'Terumot and Ma'asrot' are abstract and mathematical, making them dry and difficult for children to grasp.",
       solution:
-        "Developed a 'Sorting Frenzy' style game where players must physically drag and separate crops into the correct bins before time runs out.",
+        "Developed a 'Sorting Frenzy' style game where players physically drag and separate crops into the correct bins before time runs out.",
       coreLoop:
         "Crops Appear -> Identify Type -> Drag to Correct Bin -> Score Points -> Speed Increase.",
       systems:
@@ -270,43 +269,43 @@ export const projectsData: Project[] = [
   {
     id: "raanana-city",
     title: "The Ra'anana City Challenge",
-    tagline: "Location-based urban gaming experience.",
-    role: "Lead Designer",
-    team: "Mobile Dev Team",
+    tagline: "AR mobile game combining navigation and educational challenges exploring the city's history.",
+    role: "Game Designer & Art Director",
+    team: "Quala Group",
     duration: "3 Months",
-    platform: "Mobile App / Outdoor",
-    tools: ["GPS API", "Unity Mobile"],
+    platform: "Mobile App / Outdoor AR",
+    tools: ["Unity", "ARKit", "ARCore", "GPS API"],
     media: {
       thumbnail: projectImages.raanana,
       hero: projectImages.raanana,
       video: getEmbedUrl(videoIds.raanana),
     },
     responsibilities: [
-      "Designed the geo-fencing logic and station triggers.",
-      "Created AR challenges that activate only at specific landmarks.",
-      "Balanced walking time vs. playing time to maintain engagement.",
-      "Wrote the narrative connecting the city's historical sites.",
+      "Designed geo-fencing logic and station triggers for AR challenges.",
+      "Created AR challenges that activate only at specific city landmarks.",
+      "Built as an orientation experience for school students.",
+      "Designed logo assembly mechanic — completing challenges unlocks pieces of the city's logo.",
     ],
     content: {
       problem:
-        "Getting residents, especially youth, to physically visit and engage with local heritage sites.",
+        "Getting residents, especially youth, to physically visit and engage with local heritage sites in Ra'anana.",
       solution:
-        "A 'Pokemon GO' style scavenger hunt where historical locations unlock digital puzzles and rewards.",
+        "An AR mobile game where players use an interactive map to find challenge locations across the city. Each location features AR tasks that test knowledge and problem-solving. Completing a challenge unlocks a piece of the city's logo.",
       coreLoop:
-        "Navigate to Map Marker -> Arrive at Location -> Unlock AR Puzzle -> Solve -> Earn Badge.",
-      systems: "Progression: Collection book filling up with local achievements.",
+        "Navigate to Map Marker -> Arrive at Location -> Unlock AR Challenge -> Solve -> Earn Logo Piece.",
+      systems: "Progression: Logo assembly mechanic with backend for dynamic content updates.",
       uxFlow:
-        "Map View -> Proximity Alert -> Camera View (AR) -> Puzzle Interface -> Reward.",
+        "Interactive Map -> Proximity Alert -> AR Camera View -> Trivia/Puzzle -> Logo Piece Reward.",
       outcome:
-        "High participation rates during the city's centennial celebration events.",
+        "High participation rates during the city's events, successfully deployed as an orientation experience for school students.",
     },
   },
   {
     id: "hexa-puzzle",
     title: "Hexa Puzzle",
-    tagline: "Addictive logic puzzle for mobile platforms.",
-    role: "Solo Game Designer",
-    team: "Self",
+    tagline: "Geometric puzzle game on a hexagonal grid with honeycomb visual theme.",
+    role: "Game Designer & Producer",
+    team: "Studio Team",
     duration: "2 Months",
     platform: "Mobile (iOS/Android)",
     tools: ["Unity 2D", "C#"],
@@ -316,23 +315,23 @@ export const projectsData: Project[] = [
       video: getEmbedUrl(videoIds.hexa),
     },
     responsibilities: [
-      "Designed hundreds of levels with increasing difficulty curves.",
-      "Implemented the hint system and monetization logic.",
-      "Polished the 'juiciness' (visual feedback) of piece placement.",
-      "Analyzed player drop-off points to refine level ordering.",
+      "Improved gameplay mechanics, feature set, and monetization systems.",
+      "Designed hexagonal grid with honeycomb visual theme.",
+      "Implemented no-rotation mechanic forcing spatial thinking.",
+      "Created a relaxed experience with no time limit.",
     ],
     content: {
       problem:
-        "Creating a puzzle game that feels fresh in a saturated market while keeping the scope manageable for a solo dev.",
+        "Creating a puzzle game that feels fresh in a saturated market with a unique hexagonal mechanic.",
       solution:
-        "Focused on a 'Zen' aesthetic with satisfying snap-mechanics and no time pressure, differentiating from frantic match-3s.",
+        "A geometric puzzle where players drag hexagonal blocks into the grid to fill frames. Blocks cannot be rotated, forcing spatial thinking. No time limit creates a relaxed experience.",
       coreLoop:
-        "Observe Board -> Drag Piece -> Check Fit -> Clear Lines -> Level Up.",
+        "Observe Board -> Drag Hexagonal Block -> Fill Frame -> Clear Lines -> Level Up.",
       systems:
-        "Difficulty: Organic curve based on available board space and piece complexity.",
-      uxFlow: "Level Select -> Game Board -> Win State -> Ad/Reward -> Next Level.",
+        "Difficulty: Organic curve based on available board space and piece complexity. No time pressure.",
+      uxFlow: "Level Select -> Hexagonal Game Board -> Win State -> Ad/Reward -> Next Level.",
       outcome:
-        "Achieved consistent daily active users (DAU) and positive store ratings for its relaxing gameplay.",
+        "Achieved consistent daily active users and positive store ratings for its relaxing, no-pressure gameplay.",
     },
   },
 ];
