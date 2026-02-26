@@ -1,12 +1,16 @@
+import { useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Users, Clock, Monitor, Wrench } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, ArrowRight, Users, Clock, Monitor, Wrench, Play, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { getProjectById, projectsData } from "@/data/projects";
 import { Button } from "@/components/ui/button";
 
 const ProjectPage = () => {
   const { id } = useParams<{ id: string }>();
   const project = getProjectById(id || "");
+  const [activeVideoIdx, setActiveVideoIdx] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIdx, setLightboxIdx] = useState(0);
 
   if (!project) {
     return <Navigate to="/" replace />;
@@ -18,6 +22,16 @@ const ProjectPage = () => {
 
   // Parse core loop steps
   const coreLoopSteps = project.content.coreLoop.split(" -> ");
+
+  const openLightbox = (idx: number) => {
+    setLightboxIdx(idx);
+    setLightboxOpen(true);
+  };
+
+  const closeLightbox = () => setLightboxOpen(false);
+
+  const nextImage = () => setLightboxIdx((prev) => (prev + 1) % project.media.gallery.length);
+  const prevImage = () => setLightboxIdx((prev) => (prev - 1 + project.media.gallery.length) % project.media.gallery.length);
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,7 +116,7 @@ const ProjectPage = () => {
 
       {/* Content Sections */}
       <div className="container px-6 md:px-8 py-16 md:py-24">
-        <div className="max-w-4xl mx-auto space-y-20">
+        <div className="max-w-5xl mx-auto space-y-20">
           {/* The Challenge */}
           <motion.section
             initial={{ opacity: 0, y: 30 }}
@@ -156,16 +170,85 @@ const ProjectPage = () => {
             <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">
               <span className="text-gold-gradient">Video Showcase</span>
             </h2>
-            <div className="relative aspect-video rounded-lg overflow-hidden bg-card border border-border">
+            
+            {/* Main video player */}
+            <div className="relative aspect-video rounded-lg overflow-hidden bg-card border border-border mb-4">
               <iframe
-                src={project.media.video}
-                title={`${project.title} Video`}
+                key={project.media.videos[activeVideoIdx]?.id}
+                src={`https://www.youtube.com/embed/${project.media.videos[activeVideoIdx]?.id}`}
+                title={project.media.videos[activeVideoIdx]?.title}
                 className="absolute inset-0 w-full h-full"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
             </div>
+
+            {/* Video title */}
+            <p className="text-sm text-foreground font-medium mb-4">
+              {project.media.videos[activeVideoIdx]?.title}
+            </p>
+
+            {/* Video thumbnails list */}
+            {project.media.videos.length > 1 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {project.media.videos.map((video, idx) => (
+                  <button
+                    key={video.id}
+                    onClick={() => setActiveVideoIdx(idx)}
+                    className={`group relative aspect-video rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                      idx === activeVideoIdx
+                        ? "border-primary shadow-gold"
+                        : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <img
+                      src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-background/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Play className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 to-transparent p-1.5">
+                      <span className="text-[10px] text-foreground leading-tight line-clamp-2">{video.title}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.section>
+
+          {/* Photo Gallery */}
+          {project.media.gallery.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">
+                <span className="text-gold-gradient">Photo Gallery</span>
+              </h2>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {project.media.gallery.map((img, idx) => (
+                  <button
+                    key={img}
+                    onClick={() => openLightbox(idx)}
+                    className="group relative aspect-[4/3] rounded-lg overflow-hidden border border-border hover:border-primary/50 transition-all duration-200"
+                  >
+                    <img
+                      src={img}
+                      alt={`${project.title} screenshot ${idx + 1}`}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-background/0 group-hover:bg-background/20 transition-colors duration-200" />
+                  </button>
+                ))}
+              </div>
+            </motion.section>
+          )}
 
           {/* Core Loop */}
           <motion.section
@@ -251,6 +334,55 @@ const ProjectPage = () => {
           </div>
         </Link>
       </section>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-background/95 backdrop-blur-md flex items-center justify-center"
+            onClick={closeLightbox}
+          >
+            <button
+              onClick={closeLightbox}
+              className="absolute top-6 right-6 p-2 rounded-full bg-card border border-border hover:bg-accent transition-colors"
+            >
+              <X className="w-6 h-6 text-foreground" />
+            </button>
+
+            <button
+              onClick={(e) => { e.stopPropagation(); prevImage(); }}
+              className="absolute left-4 md:left-8 p-2 rounded-full bg-card border border-border hover:bg-accent transition-colors"
+            >
+              <ChevronLeft className="w-6 h-6 text-foreground" />
+            </button>
+
+            <motion.img
+              key={lightboxIdx}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              src={project.media.gallery[lightboxIdx]}
+              alt={`${project.title} screenshot ${lightboxIdx + 1}`}
+              className="max-w-[90vw] max-h-[85vh] object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            <button
+              onClick={(e) => { e.stopPropagation(); nextImage(); }}
+              className="absolute right-4 md:right-8 p-2 rounded-full bg-card border border-border hover:bg-accent transition-colors"
+            >
+              <ChevronRight className="w-6 h-6 text-foreground" />
+            </button>
+
+            <div className="absolute bottom-6 text-sm text-muted-foreground">
+              {lightboxIdx + 1} / {project.media.gallery.length}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
