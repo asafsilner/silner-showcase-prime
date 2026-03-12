@@ -1,0 +1,21 @@
+{
+  "headless": false,
+  "timeout": 60,
+  "debug": false,
+  "default_notebook_id": "313bae7f-b1dc-4a7b-ac02-34e4ba1ea30c",
+  "base_url": "https://notebooklm.google.com",
+  "server_name": "notebooklm-mcp",
+  "stdio_mode": true,
+  "auth": {
+    "cookies_path": null,
+    "profile_dir": "./chrome_profile_notebooklm",
+    "use_persistent_session": true,
+    "auto_login": true,
+    "import_profile_from": null,
+    "export_profile_to": null,
+    "skip_manual_login": false
+  },
+  "streaming_timeout": 60,
+  "response_stability_checks": 3,
+  "retry_attempts": 3
+}
