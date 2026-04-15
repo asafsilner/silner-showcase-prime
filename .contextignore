@@ -1,0 +1,37 @@
+# Token optimizer: exclude binary and generated files from context scans
+
+# Lock files
+bun.lockb
+package-lock.json
+
+# Public assets (images, favicons, etc.)
+public/
+
+# Project image directories (raw assets per project)
+HW/
+Bubble-Shooter/
+City-Gate---Midba-Map---Immersive-Projection-Experience/
+Farm-Escape/
+Hexa-Puzzle/
+Marlboro Touch XL/
+Multigames-5-3/
+Runner-Games/
+Slots-Games-3-3/
+Slots-Games-5x3/
+Solitaire-Clash/
+Terumot-and-Ma-asrot---Educational-Interactive-Experience/
+The-Jimi-Hendrix--Experience---Connected-TV-Slots-Game/
+The-Ra-anana-City-Challenge/
+The-Sassoon-Codex-Bible/
+VR-Railway-Walk---Safety-Week--Israel-Railway/
+hw/
+logo/
+
+# Root-level image
+HW-CHEXP-Floor-Map.jpg
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
