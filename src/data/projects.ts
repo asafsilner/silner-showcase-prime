@@ -76,6 +76,38 @@ export interface Project {
 
 export const projectsData: Project[] = [
   {
+    id: "mempalace",
+    title: "MemPalace",
+    tagline: "The best-benchmarked open-source AI memory system — local-first, privacy-preserving, 98.4% recall accuracy.",
+    role: "Creator & Lead Engineer",
+    team: "Open Source",
+    duration: "Ongoing",
+    platform: "Open Source / Python / AI",
+    tools: ["Python", "ChromaDB", "SQLite", "MCP Server", "Vector Embeddings"],
+    media: {
+      thumbnail: "/placeholder.svg",
+      hero: "/placeholder.svg",
+      video: "",
+      videos: [],
+      gallery: [],
+    },
+    responsibilities: [
+      "Architected a local-first AI memory system with structured hierarchical storage (Wings → Rooms → Drawers).",
+      "Built pluggable vector store backends — ChromaDB by default, extensible via clean interfaces.",
+      "Implemented a temporal knowledge graph using SQLite for entity-relationship tracking.",
+      "Exposed 29 MCP (Model Context Protocol) tools for AI agent integration.",
+      "Achieved 98.4% R@5 recall on LongMemEval (500 questions) with hybrid retrieval — no LLM reranking required.",
+    ],
+    content: {
+      problem: "AI assistants forget everything between sessions. Storing context in prompts doesn't scale, and cloud memory solutions compromise user privacy by sending data to third-party servers.",
+      solution: "A local-first memory palace that stores conversation history verbatim and retrieves it through semantic search — nothing leaves the user's machine. Structured hierarchically as Wings (people/projects), Rooms (topics), and Drawers (original content), with a temporal knowledge graph layered on top.",
+      coreLoop: "Input Conversation -> Chunk & Embed -> Store in Palace -> Semantic Query -> Hybrid Rerank -> Ranked Recall",
+      systems: "Storage: ChromaDB vector store (swappable via interface). Knowledge graph: SQLite with temporal entity-relationship tracking. Embedding: ~300 MB local model — zero API calls required for base retrieval.",
+      uxFlow: "Create Wing -> Define Rooms -> Store Conversations -> Query by Semantic Similarity -> Retrieve Ranked Results -> Feed to Agent.",
+      outcome: "98.4% R@5 on LongMemEval (500 questions), 88.9% R@10 on LoCoMo, and 92.9% average recall on ConvoMem — the best-benchmarked open-source AI memory system, with zero data leaving the machine without user opt-in.",
+    },
+  },
+  {
     id: "hot-wheels",
     title: "Hot Wheels Champion Experience",
     tagline: "Art Direction, Game & Interface Design for a 16,000 sq ft entertainment complex.",
