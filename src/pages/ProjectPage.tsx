@@ -161,6 +161,7 @@ const ProjectPage = () => {
           </motion.section>
 
           {/* Video Showcase */}
+          {project.media.videos.length > 0 && (
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -170,7 +171,7 @@ const ProjectPage = () => {
             <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">
               <span className="text-gold-gradient">Video Showcase</span>
             </h2>
-            
+
             {/* Main video player */}
             <div className="relative aspect-video rounded-lg overflow-hidden bg-card border border-border mb-4">
               <iframe
@@ -218,6 +219,7 @@ const ProjectPage = () => {
               </div>
             )}
           </motion.section>
+          )}
 
           {/* Photo Gallery */}
           {project.media.gallery.length > 0 && (
