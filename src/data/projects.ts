@@ -76,6 +76,40 @@ export interface Project {
 
 export const projectsData: Project[] = [
   {
+    id: "omnivoice-studio",
+    title: "OmniVoice Studio",
+    tagline: "Local-first voice AI platform — zero-shot voice cloning, video dubbing, and real-time dictation across 646 languages, all on your own hardware.",
+    role: "Open Source / Voice AI Platform",
+    team: "Open Source Community",
+    duration: "Ongoing",
+    platform: "Desktop App (Windows / macOS / Linux)",
+    tools: ["FastAPI", "React + Vite", "WhisperX", "Demucs", "Pyannote", "AudioSeal"],
+    media: {
+      thumbnail: "/placeholder.svg",
+      hero: "/placeholder.svg",
+      video: "",
+      videos: [],
+      gallery: [],
+    },
+    responsibilities: [
+      "Built a local-first alternative to ElevenLabs with full offline support and no API keys required.",
+      "Integrated WhisperX for transcription and Pyannote for speaker diarization across 646 languages.",
+      "Designed a 97-endpoint FastAPI backend handling voice cloning, dubbing, and synthesis pipelines.",
+      "Implemented Demucs-powered vocal isolation to preserve background audio during dubbing.",
+      "Created a system-wide dictation widget with a global hotkey (⌘+⇧+Space) usable in any application.",
+      "Added AudioSeal AI watermarking for invisible, verifiable audio provenance tracking.",
+      "Integrated as an MCP server for use inside Claude, Cursor, and compatible AI clients.",
+    ],
+    content: {
+      problem: "Professional voice AI tools like ElevenLabs require cloud subscriptions and send audio data to external servers, creating privacy concerns, ongoing API costs, and hard dependency on internet connectivity for any voice synthesis workflow.",
+      solution: "OmniVoice Studio runs entirely on local hardware — users can clone a voice from a 3-second clip, dub videos across 646 languages, and dictate text system-wide, all without an API key or network connection. The FastAPI backend (97 endpoints) handles the full pipeline from transcription through synthesis to MP4 export, with automatic GPU detection for CUDA, Apple Silicon MPS, ROCm, and CPU fallback.",
+      coreLoop: "Record 3-second clip -> Clone Voice -> Select Language -> Synthesize or Dub -> Export MP4/Audio",
+      systems: "Architecture: WhisperX (transcription) + Demucs (source separation) + OmniVoice diffusion model (TTS) + Pyannote (diarization). Batch processing queue handles multiple jobs simultaneously. AudioSeal watermarking embeds invisible provenance data. MCP server integration exposes the full API inside AI coding clients.",
+      uxFlow: "Install Desktop App -> Load Audio or Record Clip -> Select Feature (Clone / Design / Dub / Dictate) -> Configure Voice Parameters -> Process Locally -> Download Output.",
+      outcome: "1,700+ GitHub stars. Runs fully offline on Windows, macOS, and Linux. Supports 646 languages with zero API key requirement. Available as a pre-built installer and via Docker, and integrates as an MCP server into Claude, Cursor, and other AI clients.",
+    },
+  },
+  {
     id: "hot-wheels",
     title: "Hot Wheels Champion Experience",
     tagline: "Art Direction, Game & Interface Design for a 16,000 sq ft entertainment complex.",
