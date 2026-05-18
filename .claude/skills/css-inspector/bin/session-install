@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Installs the css-inspector skill from the project into ~/.claude/skills/
+set -euo pipefail
+
+SKILL_SRC="$(cd "$(dirname "$0")/.." && pwd)"
+SKILLS_DIR="${CLAUDE_SKILLS_DIR:-$HOME/.claude/skills}"
+TARGET="$SKILLS_DIR/css-inspector"
+
+mkdir -p "$SKILLS_DIR"
+
+if [ -L "$TARGET" ] && [ "$(readlink "$TARGET")" = "$SKILL_SRC" ]; then
+  exit 0
+fi
+
+if [ -L "$TARGET" ]; then
+  rm "$TARGET"
+elif [ -d "$TARGET" ]; then
+  rm -rf "$TARGET"
+fi
+
+ln -s "$SKILL_SRC" "$TARGET"
+echo "css-inspector skill installed at $TARGET"
