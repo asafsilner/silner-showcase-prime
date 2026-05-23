@@ -76,6 +76,43 @@ export interface Project {
 
 export const projectsData: Project[] = [
   {
+    id: "design-canvas",
+    title: "Design Canvas",
+    tagline: "AI-powered 3D staging tool that transforms rough scene compositions into photorealistic product renders via SDXL diffusion.",
+    role: "Creator & Full-Stack Developer",
+    team: "Solo Project (Open Source)",
+    duration: "Ongoing",
+    platform: "Web Application",
+    tools: ["Three.js", "Python", "FastAPI", "ComfyUI", "Stable Diffusion XL", "WebSockets", "HTML5 Canvas"],
+    media: {
+      thumbnail: "https://raw.githubusercontent.com/Pro2004-a11/design_canvas/main/docs/screenshots/01-creative-ai.jpg",
+      hero: "https://raw.githubusercontent.com/Pro2004-a11/design_canvas/main/docs/screenshots/01-creative-ai.jpg",
+      video: "",
+      videos: [],
+      gallery: [
+        "https://raw.githubusercontent.com/Pro2004-a11/design_canvas/main/docs/screenshots/01-creative-ai.jpg",
+        "https://raw.githubusercontent.com/Pro2004-a11/design_canvas/main/docs/screenshots/02-product-shot.jpg",
+        "https://raw.githubusercontent.com/Pro2004-a11/design_canvas/main/docs/screenshots/03-any-ai-tool.jpg",
+        "https://raw.githubusercontent.com/Pro2004-a11/design_canvas/main/docs/screenshots/04-game-designer.jpg",
+        "https://raw.githubusercontent.com/Pro2004-a11/design_canvas/main/docs/screenshots/07-local-ai-render.jpg",
+      ],
+    },
+    responsibilities: [
+      "Designed and built a Three.js-based 3D staging environment with OBJ/GLB model import and real-time WebGL rendering.",
+      "Built a FastAPI backend that auto-launches ComfyUI as a subprocess, keeping the app VRAM-free until generation starts.",
+      "Created a 2D annotation layer (pencil, eraser, line, arrow, text) composited over the 3D viewport for prompt-driven sketching.",
+      "Implemented live WebSocket progress updates, an A/B comparison slider, seed reproducibility, and style presets (Studio, Lifestyle, Catalog).",
+    ],
+    content: {
+      problem: "Product designers and concept artists need to rapidly prototype photorealistic renders from rough 3D layouts, but traditional pipelines require expensive software, dedicated GPU workstations, and hours of manual work per iteration.",
+      solution: "Design Canvas separates the staging layer (lightweight Three.js scene in the browser) from the generation layer (ComfyUI + SDXL running as a local subprocess). Users position 3D primitives or imported models, annotate with drawings, write a prompt, and receive a photorealistic render — all in one browser tab with zero cloud dependency.",
+      coreLoop: "Stage 3D Scene -> Annotate & Prompt -> Submit to ComfyUI -> Live Progress -> Compare A/B -> Iterate",
+      systems: "Architecture: Three.js (r162) frontend with OBJLoader/GLTFLoader for asset import; FastAPI + Uvicorn backend that owns zero VRAM and delegates all GPU work to a ComfyUI subprocess; WebSocket channel streams generation progress in real time. Style presets map to named SDXL workflow templates stored as JSON.",
+      uxFlow: "Import or place 3D primitives -> Adjust lighting & camera preset -> Draw annotations on 2D overlay -> Write generation prompt -> Trigger render -> Monitor live progress bar -> Review with A/B comparison slider -> Save to gallery or export.",
+      outcome: "An open-source, MIT-licensed tool published on GitHub that enables any designer with a local GPU to iterate on photorealistic product renders at the speed of thought — no API keys, no cloud costs, no render farm queue.",
+    },
+  },
+  {
     id: "hot-wheels",
     title: "Hot Wheels Champion Experience",
     tagline: "Art Direction, Game & Interface Design for a 16,000 sq ft entertainment complex.",
