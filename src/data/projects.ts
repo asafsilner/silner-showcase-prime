@@ -76,6 +76,37 @@ export interface Project {
 
 export const projectsData: Project[] = [
   {
+    id: "deep-search",
+    title: "Deep Search Agent",
+    tagline: "Production-ready fullstack AI research agent — Gemini-powered multi-agent pipeline with human-in-the-loop approval.",
+    role: "AI Systems Architect",
+    team: "Google ADK",
+    duration: "3 Months",
+    platform: "Web App (React + FastAPI)",
+    tools: ["Google Gemini", "Agent Development Kit (ADK)", "FastAPI", "React", "Vite", "Tailwind CSS", "Shadcn UI", "Google Cloud Run"],
+    media: {
+      thumbnail: "/placeholder.svg",
+      hero: "/placeholder.svg",
+      video: "",
+      videos: [],
+      gallery: [],
+    },
+    responsibilities: [
+      "Designed a two-phase multi-agent research pipeline: collaborative planning with human approval, then autonomous iterative execution.",
+      "Built a Human-in-the-Loop system where users review, modify, and approve the research plan before autonomous web search begins.",
+      "Architected four specialized agents — planner, researcher, critic, and composer — for iterative refinement and report synthesis.",
+      "Deployed fullstack application with React/Vite frontend and FastAPI backend to Google Cloud Run via Agent Runtime.",
+    ],
+    content: {
+      problem: "Transforming open-ended research questions into comprehensive, well-sourced reports requires both strategic planning and iterative refinement — tasks that typically demand significant human time and expertise.",
+      solution: "A two-phase fullstack research agent: Phase 1 presents a human-approved research plan with labeled objectives ([RESEARCH], [DELIVERABLE], [MODIFIED], [NEW], [IMPLIED]). Phase 2 autonomously executes iterative web search cycles — searching, critiquing gaps, and refining until quality thresholds are met, then synthesizes a cited report.",
+      coreLoop: "Submit Topic -> Review & Approve Plan -> Autonomous Web Search -> Critique Gaps -> Refine Research -> Synthesize Cited Report",
+      systems: "Multi-agent architecture: planner, researcher, critic, and composer agents. Config-driven iteration counts and model selection. Deployable to Google Cloud Run or Agent Runtime with CI/CD support.",
+      uxFlow: "Topic Input -> Plan Review (HITL) -> Approve/Modify Plan -> Autonomous Execution -> Progress Stream -> Final Report with Inline Citations.",
+      outcome: "Published as a production-ready blueprint in Google's ADK Samples repository — a reference implementation for advanced multi-agent research workflows using Gemini function calling, web search, and React/FastAPI fullstack architecture.",
+    },
+  },
+  {
     id: "hot-wheels",
     title: "Hot Wheels Champion Experience",
     tagline: "Art Direction, Game & Interface Design for a 16,000 sq ft entertainment complex.",

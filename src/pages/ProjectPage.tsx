@@ -161,63 +161,65 @@ const ProjectPage = () => {
           </motion.section>
 
           {/* Video Showcase */}
-          <motion.section
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">
-              <span className="text-gold-gradient">Video Showcase</span>
-            </h2>
-            
-            {/* Main video player */}
-            <div className="relative aspect-video rounded-lg overflow-hidden bg-card border border-border mb-4">
-              <iframe
-                key={project.media.videos[activeVideoIdx]?.id}
-                src={`https://www.youtube.com/embed/${project.media.videos[activeVideoIdx]?.id}`}
-                title={project.media.videos[activeVideoIdx]?.title}
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+          {project.media.videos.length > 0 && (
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="font-display text-2xl md:text-3xl font-bold mb-6">
+                <span className="text-gold-gradient">Video Showcase</span>
+              </h2>
 
-            {/* Video title */}
-            <p className="text-sm text-foreground font-medium mb-4">
-              {project.media.videos[activeVideoIdx]?.title}
-            </p>
-
-            {/* Video thumbnails list */}
-            {project.media.videos.length > 1 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {project.media.videos.map((video, idx) => (
-                  <button
-                    key={video.id}
-                    onClick={() => setActiveVideoIdx(idx)}
-                    className={`group relative aspect-video rounded-md overflow-hidden border-2 transition-all duration-200 ${
-                      idx === activeVideoIdx
-                        ? "border-primary shadow-gold"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                  >
-                    <img
-                      src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
-                      alt={video.title}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                    />
-                    <div className="absolute inset-0 bg-background/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Play className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 to-transparent p-1.5">
-                      <span className="text-[10px] text-foreground leading-tight line-clamp-2">{video.title}</span>
-                    </div>
-                  </button>
-                ))}
+              {/* Main video player */}
+              <div className="relative aspect-video rounded-lg overflow-hidden bg-card border border-border mb-4">
+                <iframe
+                  key={project.media.videos[activeVideoIdx]?.id}
+                  src={`https://www.youtube.com/embed/${project.media.videos[activeVideoIdx]?.id}`}
+                  title={project.media.videos[activeVideoIdx]?.title}
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
               </div>
-            )}
-          </motion.section>
+
+              {/* Video title */}
+              <p className="text-sm text-foreground font-medium mb-4">
+                {project.media.videos[activeVideoIdx]?.title}
+              </p>
+
+              {/* Video thumbnails list */}
+              {project.media.videos.length > 1 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {project.media.videos.map((video, idx) => (
+                    <button
+                      key={video.id}
+                      onClick={() => setActiveVideoIdx(idx)}
+                      className={`group relative aspect-video rounded-md overflow-hidden border-2 transition-all duration-200 ${
+                        idx === activeVideoIdx
+                          ? "border-primary shadow-gold"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <img
+                        src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`}
+                        alt={video.title}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-background/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Play className="w-6 h-6 text-primary" />
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 to-transparent p-1.5">
+                        <span className="text-[10px] text-foreground leading-tight line-clamp-2">{video.title}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </motion.section>
+          )}
 
           {/* Photo Gallery */}
           {project.media.gallery.length > 0 && (
