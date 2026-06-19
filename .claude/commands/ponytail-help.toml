@@ -1,0 +1,30 @@
+description = "Show ponytail quick reference card"
+prompt = """
+Display the ponytail quick reference card:
+
+**ponytail** — lazy senior dev mode. The best code is the code you never wrote.
+
+Levels:
+- lite    → build what's asked; suggest simpler in one line
+- full    → full YAGNI ladder, every time (default)
+- ultra   → deletion-first; challenge the requirement before building
+
+The ladder (run before every implementation):
+1. Does this need to exist? → Skip (YAGNI)
+2. Stdlib solves it? → Use it
+3. Native platform feature? → Use it
+4. Installed dep does it? → Use it
+5. One line? → One line
+6. Only then: minimum viable
+
+Commands:
+- /ponytail [level]     — set intensity (lite/full/ultra/off)
+- /ponytail-review      — find over-engineering in current diff
+- /ponytail-audit       — scan entire repo for cuts
+- /ponytail-debt        — harvest ponytail: comment markers
+- /ponytail-gain        — show benchmark impact scoreboard
+- /ponytail-help        — this card
+
+Deactivate: say 'stop ponytail', 'normal mode', or /ponytail off
+Config: PONYTAIL_DEFAULT_MODE env var or ~/.config/ponytail/config.json {"defaultMode":"lite"}
+"""
