@@ -15,10 +15,12 @@ const videoIds = {
   slots3x3: ["dLIfnAfX4x4"],
   slots5x3: ["20UBniuHYG0"],
   multigames: ["NKgFmhoa43Y"],
+  whatDreamsCost: ["o0l6Ikvn5Q0", "vM60pJJqqEI", "aXDIr8eNovI"],
 };
 
 // --- THUMBNAIL CONFIGURATION ---
 const projectImages = {
+  whatDreamsCost: "/projects/whatdreamscost-comfyui.png",
   hotWheels: "/projects/hot-wheels.jpg",
   jimi: "/projects/jimi-hendrix.jpg",
   railway: "/projects/vr-railway.jpg",
@@ -75,6 +77,50 @@ export interface Project {
 }
 
 export const projectsData: Project[] = [
+  {
+    id: "whatdreamscost-comfyui",
+    title: "WhatDreamsCost — ComfyUI Custom Nodes",
+    tagline: "Open-source AI video toolkit for ComfyUI — LTX Director, sequencers, loaders, and more. 1.4k GitHub stars.",
+    role: "Creator & Developer",
+    team: "Solo / Open Source",
+    duration: "Ongoing",
+    platform: "ComfyUI / Stable Diffusion",
+    tools: ["Python", "JavaScript", "ComfyUI", "LTX Video", "AI Video Generation"],
+    media: {
+      thumbnail: projectImages.whatDreamsCost,
+      hero: projectImages.whatDreamsCost,
+      video: getEmbedUrl(videoIds.whatDreamsCost[0]),
+      videos: [
+        { id: videoIds.whatDreamsCost[0], title: "LTX Director 2.0 — Full Trailer" },
+        { id: videoIds.whatDreamsCost[1], title: "LTX Director 1.0 — Tutorial" },
+        { id: videoIds.whatDreamsCost[2], title: "Custom Nodes Tutorial (v1.1.0)" },
+      ],
+      gallery: [
+        "/gallery/whatdreamscost-comfyui/ltx-director.png",
+        "/gallery/whatdreamscost-comfyui/multi-image-loader.gif",
+        "/gallery/whatdreamscost-comfyui/ltx-sequencer.gif",
+        "/gallery/whatdreamscost-comfyui/ltx-keyframer.png",
+        "/gallery/whatdreamscost-comfyui/speech-calculator.gif",
+        "/gallery/whatdreamscost-comfyui/load-video-ui.gif",
+        "/gallery/whatdreamscost-comfyui/load-audio-ui.gif",
+      ],
+    },
+    responsibilities: [
+      "Designed and built LTX Director 2.0 — a full timeline editor node for AI video generation inside ComfyUI.",
+      "Created Multi Image Loader with a built-in gallery for batching and organizing images.",
+      "Built LTX Sequencer for rapid First Frame / Last Frame video creation with real-time sync.",
+      "Developed Load Video UI and Load Audio UI with trimming, drag-and-drop, and live preview.",
+      "Released the entire toolkit as free, open-source software — reaching 1.4k GitHub stars.",
+    ],
+    content: {
+      problem: "Creating AI-generated videos in ComfyUI required assembling complex, fragile node graphs with no intuitive timeline editing, media management, or audio support.",
+      solution: "A suite of free custom nodes centered on LTX Director 2.0 — a full-featured timeline editor with IC-LoRA support, audio inpainting, retake mode for regenerating specific segments, and a redesigned UI — packaged alongside utility nodes for image batching, video trimming, and audio loading.",
+      coreLoop: "Load Media -> Arrange in Timeline -> Set Keyframes -> Generate with AI -> Retake or Export",
+      systems: "LTX Director 2.0 integrates IC-LoRA support, audio inpainting, retake mode, and timeline save/load. Companion nodes (Sequencer, Keyframer, Speech Calculator) synchronize in real-time without re-running the full workflow.",
+      uxFlow: "Install via ComfyUI Manager -> Load Video/Audio UI -> Build Timeline in LTX Director -> Add Keyframes -> Generate Segment -> Retake if Needed -> Export.",
+      outcome: "Reached 1.4k GitHub stars as a free open-source release. Adopted by the ComfyUI community as a go-to toolkit for AI video production.",
+    },
+  },
   {
     id: "hot-wheels",
     title: "Hot Wheels Champion Experience",
