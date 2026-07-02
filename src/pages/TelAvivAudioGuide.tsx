@@ -14,7 +14,7 @@ import { Progress } from "@/components/ui/progress";
 import MapView from "@/components/audio-guide/MapView";
 import POIDetailSheet from "@/components/audio-guide/POIDetailSheet";
 import POIListSheet from "@/components/audio-guide/POIListSheet";
-import { telAvivAudioGuidePOIs } from "@/data/telAvivAudioGuide";
+import { telAvivAudioGuidePOIs, type AudioGuideStory } from "@/data/telAvivAudioGuide";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useSpeech } from "@/hooks/useSpeech";
 import { distanceMeters, formatDistance } from "@/lib/geo";
@@ -101,11 +101,11 @@ const TelAvivAudioGuide = () => {
     setActivePoiId(id);
   };
 
-  const handlePlay = () => {
+  const handlePlay = (story: AudioGuideStory, variantId: string) => {
     if (!activePoi) return;
     markVisited(activePoi.id);
     announcedRef.current.add(activePoi.id);
-    speech.speak(activePoi.id, activePoi.audio_script);
+    speech.speak(variantId, story.audio_script);
   };
 
   const handleStartTour = () => {
@@ -214,7 +214,7 @@ const TelAvivAudioGuide = () => {
         poi={activePoi}
         distanceLabel={activeDistance}
         isVisited={activePoiId ? visitedIds.has(activePoiId) : false}
-        isSpeaking={speech.speaking && speech.speakingId === activePoiId}
+        speakingId={speech.speaking ? speech.speakingId : null}
         isPaused={speech.paused}
         onOpenChange={(open) => {
           if (!open) {

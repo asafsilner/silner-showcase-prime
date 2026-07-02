@@ -1,17 +1,21 @@
+import { useEffect, useState } from "react";
 import { Drawer, DrawerContent, DrawerTitle, DrawerDescription } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Play, Pause, Square, Eye, CheckCircle2, MapPin } from "lucide-react";
-import type { AudioGuidePOI } from "@/data/telAvivAudioGuide";
+import { Play, Pause, Square, Eye, CheckCircle2, MapPin, Shuffle } from "lucide-react";
+import type { AudioGuidePOI, AudioGuideStory } from "@/data/telAvivAudioGuide";
+
+/** Suffix appended to a POI's id to identify its alternate-narrative utterance. */
+export const SECOND_STORY_SUFFIX = "::second";
 
 interface POIDetailSheetProps {
   poi: AudioGuidePOI | null;
   distanceLabel: string | null;
   isVisited: boolean;
-  isSpeaking: boolean;
+  speakingId: string | null;
   isPaused: boolean;
   onOpenChange: (open: boolean) => void;
-  onPlay: () => void;
+  onPlay: (story: AudioGuideStory, variantId: string) => void;
   onTogglePause: () => void;
   onStop: () => void;
 }
@@ -20,13 +24,24 @@ export default function POIDetailSheet({
   poi,
   distanceLabel,
   isVisited,
-  isSpeaking,
+  speakingId,
   isPaused,
   onOpenChange,
   onPlay,
   onTogglePause,
   onStop,
 }: POIDetailSheetProps) {
+  const [showSecond, setShowSecond] = useState(false);
+
+  useEffect(() => {
+    setShowSecond(false);
+  }, [poi?.id]);
+
+  const activeStory: AudioGuideStory | null =
+    poi && showSecond && poi.secondStory ? poi.secondStory : poi;
+  const variantId = poi ? poi.id + (showSecond ? SECOND_STORY_SUFFIX : "") : null;
+  const isSpeaking = !!variantId && speakingId === variantId;
+
   return (
     <Drawer open={!!poi} onOpenChange={onOpenChange}>
       <DrawerContent
@@ -52,7 +67,7 @@ export default function POIDetailSheet({
               </div>
             </div>
 
-            <p className="text-primary text-sm font-medium mb-1">{poi.hook}</p>
+            <p className="text-primary text-sm font-medium mb-1">{activeStory?.hook}</p>
             <h2 className="font-display text-2xl font-bold text-foreground mb-3">{poi.title}</h2>
 
             <div className="flex items-start gap-2 text-sm text-muted-foreground bg-secondary/50 rounded-lg p-3 mb-4">
@@ -60,9 +75,9 @@ export default function POIDetailSheet({
               <span>{poi.visual_marker}</span>
             </div>
 
-            <div className="flex items-center gap-2 mb-5">
-              {!isSpeaking && (
-                <Button onClick={onPlay} className="gap-2">
+            <div className="flex items-center gap-2 mb-5 flex-wrap">
+              {!isSpeaking && activeStory && (
+                <Button onClick={() => onPlay(activeStory, variantId!)} className="gap-2">
                   <Play className="w-4 h-4" /> השמעת הסיפור
                 </Button>
               )}
@@ -77,13 +92,26 @@ export default function POIDetailSheet({
                   <Square className="w-4 h-4" />
                 </Button>
               )}
+              {poi.secondStory && (
+                <Button
+                  onClick={() => {
+                    onStop();
+                    setShowSecond((v) => !v);
+                  }}
+                  variant="ghost"
+                  className="gap-2 text-muted-foreground"
+                >
+                  <Shuffle className="w-4 h-4" />
+                  {showSecond ? "חזרה לסיפור הראשי" : "עוד סיפור על המקום הזה"}
+                </Button>
+              )}
             </div>
 
-            <p className="text-foreground leading-relaxed mb-5 whitespace-pre-line">{poi.story}</p>
+            <p className="text-foreground leading-relaxed mb-5 whitespace-pre-line">{activeStory?.story}</p>
 
             <div className="bg-accent/40 border border-primary/20 rounded-lg p-4">
               <p className="text-xs font-semibold text-primary mb-1">ידעתם ש...</p>
-              <p className="text-sm text-foreground/90 leading-relaxed">{poi.fact}</p>
+              <p className="text-sm text-foreground/90 leading-relaxed">{activeStory?.fact}</p>
             </div>
           </div>
         )}
