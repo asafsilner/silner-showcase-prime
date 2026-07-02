@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,9 @@ import Header from "./components/Header";
 import Index from "./pages/Index";
 import ProjectPage from "./pages/ProjectPage";
 import NotFound from "./pages/NotFound";
+
+// Lazy-loaded: pulls in Leaflet, kept out of the main portfolio bundle.
+const TelAvivAudioGuide = lazy(() => import("./pages/TelAvivAudioGuide"));
 
 const queryClient = new QueryClient();
 
@@ -20,6 +24,14 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/project/:id" element={<ProjectPage />} />
+          <Route
+            path="/tel-aviv-audio-guide"
+            element={
+              <Suspense fallback={<div className="fixed inset-0 bg-background" />}>
+                <TelAvivAudioGuide />
+              </Suspense>
+            }
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
