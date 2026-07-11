@@ -68,6 +68,12 @@ const Header = () => {
                     >
                       About
                     </button>
+                    <Link
+                      to="/play"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors gold-underline"
+                    >
+                      Play
+                    </Link>
                     <a
                       href="mailto:asafsilner@gmail.com"
                       className="text-sm px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
@@ -88,6 +94,12 @@ const Header = () => {
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors gold-underline"
                     >
                       AI Advisor
+                    </Link>
+                    <Link
+                      to="/play"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors gold-underline"
+                    >
+                      Play
                     </Link>
                     <a
                       href="mailto:asafsilner@gmail.com"
