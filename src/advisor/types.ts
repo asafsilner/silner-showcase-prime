@@ -57,6 +57,7 @@ export type QuestionType =
 
 /** Profile fields the interview tries to fill. */
 export type ProfileField =
+  | "selfDescription"
   | "role"
   | "tasks"
   | "pains"
@@ -138,6 +139,8 @@ export interface ConfidenceReport {
 export type LearningStyle = "video" | "reading" | "hands-on" | "mentored";
 
 export interface PersonaProfile {
+  /** The user's own words about what they do (first interview answer). */
+  selfDescription: string;
   roleId: string | null;
   roleLabel: string;
   /** Task node ids ranked by time spent (first = most). */

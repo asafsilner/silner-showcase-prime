@@ -18,7 +18,8 @@ interface FieldSpec {
 }
 
 const FIELD_SPECS: FieldSpec[] = [
-  { field: "role", importance: 1.0, targetEvidence: 1, reason: "בלי תפקיד אי אפשר למפות משימות" },
+  { field: "selfDescription", importance: 1.0, targetEvidence: 1, reason: "התיאור האישי הוא הבסיס לכל השאלות הבאות" },
+  { field: "role", importance: 0.98, targetEvidence: 1, dependsOn: ["selfDescription"], reason: "בלי תחום עיסוק אי אפשר למפות משימות" },
   { field: "tasks", importance: 0.95, targetEvidence: 1, dependsOn: ["role"], reason: "מפת המשימות היא הבסיס לזיהוי הזדמנויות" },
   { field: "pains", importance: 0.9, targetEvidence: 1, dependsOn: ["tasks"], reason: "החסמים קובעים אילו הזדמנויות שוות בדיקה" },
   { field: "toolsUsed", importance: 0.7, targetEvidence: 1, reason: "כלים קיימים משפיעים על ההמלצות" },
@@ -41,8 +42,12 @@ export function findInformationGaps(answers: Answer[]): InformationGap[] {
   for (const spec of FIELD_SPECS) {
     const coverage = computeCoverage(answers, spec.field);
     if (coverage >= 1) continue;
+    // A skipped dependency counts as "handled": we asked, the user passed,
+    // and the interview must not cascade-skip everything downstream.
     const dependenciesMet = (spec.dependsOn ?? []).every(
-      (dep) => computeCoverage(answers, dep) >= 1,
+      (dep) =>
+        computeCoverage(answers, dep) >= 1 ||
+        answers.some((a) => a.field === dep && a.skipped),
     );
     // A skipped question lowers priority so the interview moves on instead
     // of nagging, but the gap stays visible for the confidence report.

@@ -17,6 +17,7 @@ import type {
 import { computeCoverage } from "./informationGapAgent";
 
 const ALL_FIELDS: ProfileField[] = [
+  "selfDescription",
   "role",
   "tasks",
   "pains",

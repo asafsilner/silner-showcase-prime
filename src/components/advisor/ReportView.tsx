@@ -57,6 +57,11 @@ const ReportView = ({ report, onRestart }: ReportViewProps) => {
               ביטחון בפרופיל: {Math.round(persona.confidence.overall * 100)}%
             </Badge>
           </div>
+          {persona.selfDescription && (
+            <p className="text-sm text-muted-foreground border-r-2 border-primary pr-3">
+              "{persona.selfDescription}"
+            </p>
+          )}
           {persona.goals && (
             <p className="text-sm text-muted-foreground">
               <span className="font-medium text-foreground">המטרה שלך: </span>
