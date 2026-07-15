@@ -169,12 +169,12 @@ describe("Role Matcher", () => {
 });
 
 describe("Personalized interview (yoga teacher)", () => {
-  it("skips the role question and offers person-relevant tasks and pains", () => {
+  it("skips the role question and offers person-relevant tasks and pains", async () => {
     const engine = new AdvisorEngine();
     let state = engine.getState();
     expect(state.currentQuestion?.field).toBe("selfDescription");
 
-    state = engine.submitAnswer("אני מדריכת יוגה עצמאית, מלמדת בסטודיו קטן");
+    state = await engine.submitAnswer("אני מדריכת יוגה עצמאית, מלמדת בסטודיו קטן");
 
     // Role was auto-assigned by the Research Agent — no role question.
     expect(state.currentQuestion?.field).toBe("tasks");
@@ -185,23 +185,23 @@ describe("Personalized interview (yoga teacher)", () => {
     // The question is phrased with the user's own words.
     expect(state.currentQuestion!.text).toContain("יוגה");
 
-    state = engine.submitAnswer(["task-inperson", "task-clients", "task-social"]);
+    state = await engine.submitAnswer(["task-inperson", "task-clients", "task-social"]);
     expect(state.currentQuestion?.field).toBe("pains");
     const painLabels = state.currentQuestion!.options!.map((o) => o.label);
     expect(painLabels.join(" ")).toContain("תיאומים");
     expect(painLabels.join(" ")).toContain("רשתות");
   });
 
-  it("produces coach-relevant recommendations end-to-end", () => {
+  it("produces coach-relevant recommendations end-to-end", async () => {
     const engine = new AdvisorEngine();
     let state = engine.getState();
     let guard = 0;
     while (state.phase === "interviewing" && state.currentQuestion && guard < 25) {
       const q = state.currentQuestion;
-      if (q.field === "selfDescription") state = engine.submitAnswer("אני מדריכת יוגה עצמאית");
-      else if (q.field === "tasks") state = engine.submitAnswer(["task-inperson", "task-clients", "task-social"]);
-      else if (q.field === "pains") state = engine.submitAnswer(["pain-scheduling", "pain-selfmarketing"]);
-      else state = engine.submitAnswer(autoAnswer(q));
+      if (q.field === "selfDescription") state = await engine.submitAnswer("אני מדריכת יוגה עצמאית");
+      else if (q.field === "tasks") state = await engine.submitAnswer(["task-inperson", "task-clients", "task-social"]);
+      else if (q.field === "pains") state = await engine.submitAnswer(["pain-scheduling", "pain-selfmarketing"]);
+      else state = await engine.submitAnswer(autoAnswer(q));
       guard += 1;
     }
     expect(state.phase).toBe("done");
@@ -213,7 +213,7 @@ describe("Personalized interview (yoga teacher)", () => {
 });
 
 describe("AdvisorEngine end-to-end", () => {
-  it("interviews, synthesizes, and produces a full report", () => {
+  it("interviews, synthesizes, and produces a full report", async () => {
     const engine = new AdvisorEngine();
     let state = engine.getState();
     expect(state.phase).toBe("interviewing");
@@ -221,7 +221,7 @@ describe("AdvisorEngine end-to-end", () => {
 
     let guard = 0;
     while (state.phase === "interviewing" && state.currentQuestion && guard < 25) {
-      state = engine.submitAnswer(autoAnswer(state.currentQuestion));
+      state = await engine.submitAnswer(autoAnswer(state.currentQuestion));
       guard += 1;
     }
 
@@ -254,7 +254,7 @@ describe("AdvisorEngine end-to-end", () => {
     }
   });
 
-  it("injects a clarification question when answers contradict", () => {
+  it("injects a clarification question when answers contradict", async () => {
     const engine = new AdvisorEngine();
     let state = engine.getState();
     let sawClarification = false;
@@ -263,13 +263,13 @@ describe("AdvisorEngine end-to-end", () => {
       const q = state.currentQuestion;
       if (q.isClarification) {
         sawClarification = true;
-        state = engine.submitAnswer("בעצם רק שמעתי על כלים, לא באמת השתמשתי");
+        state = await engine.submitAnswer("בעצם רק שמעתי על כלים, לא באמת השתמשתי");
       } else if (q.field === "aiExperience") {
-        state = engine.submitAnswer(9); // expert...
+        state = await engine.submitAnswer(9); // expert...
       } else if (q.field === "toolsUsed") {
-        state = engine.submitAnswer([]); // ...who never used a tool
+        state = await engine.submitAnswer([]); // ...who never used a tool
       } else {
-        state = engine.submitAnswer(autoAnswer(q));
+        state = await engine.submitAnswer(autoAnswer(q));
       }
       guard += 1;
     }
@@ -278,15 +278,15 @@ describe("AdvisorEngine end-to-end", () => {
     expect(state.contradictions.find((c) => c.id === "exp-high-no-tools")?.resolved).toBe(true);
   });
 
-  it("adds prompting foundations for beginners via the critic loop", () => {
+  it("adds prompting foundations for beginners via the critic loop", async () => {
     const engine = new AdvisorEngine();
     let state = engine.getState();
     let guard = 0;
     while (state.phase === "interviewing" && state.currentQuestion && guard < 25) {
       const q = state.currentQuestion;
-      if (q.field === "aiExperience") state = engine.submitAnswer(1);
-      else if (q.field === "toolsUsed") state = engine.submitAnswer([]);
-      else state = engine.submitAnswer(autoAnswer(q));
+      if (q.field === "aiExperience") state = await engine.submitAnswer(1);
+      else if (q.field === "toolsUsed") state = await engine.submitAnswer([]);
+      else state = await engine.submitAnswer(autoAnswer(q));
       guard += 1;
     }
     expect(state.phase).toBe("done");

@@ -9,6 +9,11 @@
  * Synthesis:
  *   persona → opportunities → recommendations → CRITIC LOOP →
  *   curriculum → QUALITY LOOP → final report.
+ *
+ * When a Claude API key is configured (see llm/config.ts), three steps
+ * are upgraded to the live model with graceful fallback to the
+ * rule-based path: self-description analysis (Research Agent), question
+ * phrasing (Interview Agent), and the personal report narrative.
  */
 
 import type {
@@ -28,7 +33,6 @@ import {
   generateQuestion,
   type PersonalContext,
 } from "./agents/interviewAgent";
-import { AUTO_ASSIGN_SCORE, matchRoles } from "./knowledge/roleMatcher";
 import { detectContradictions } from "./agents/consistencyAgent";
 import { CONFIDENCE_THRESHOLD, scoreConfidence } from "./agents/confidenceAgent";
 import { buildPersona } from "./agents/personaBuilder";
@@ -37,6 +41,13 @@ import { generateRecommendations } from "./agents/recommendationAgent";
 import { applyMustInclude, critiqueRecommendations } from "./agents/criticAgent";
 import { buildCurriculum } from "./agents/curriculumBuilder";
 import { assessCurriculum } from "./agents/qualityAgent";
+import { AUTO_ASSIGN_SCORE, matchRoles } from "./knowledge/roleMatcher";
+import { isLLMConfigured } from "./llm/config";
+import {
+  analyzeSelfDescriptionLLM,
+  generateNarrativeLLM,
+  personalizeQuestionLLM,
+} from "./llm/llmService";
 
 export const MAX_QUESTIONS = 14;
 export const MAX_CRITIC_ROUNDS = 3;
@@ -46,6 +57,7 @@ export class AdvisorEngine {
   private state: AdvisorState;
   /** clarification question id -> contradiction id */
   private pendingClarifications = new Map<string, string>();
+  private clarificationLog = new Map<string, string>();
   /** What the Research Agent learned from the user's own words. */
   private personalContext: PersonalContext = {};
 
@@ -64,7 +76,8 @@ export class AdvisorEngine {
       report: null,
     };
     this.trace("research", `נבנה גרף ידע: ${graph.nodes.size} צמתים, ${graph.edges.length} קשרים`);
-    this.askNext();
+    // The opening question is static — no LLM context exists yet.
+    this.pickNext();
   }
 
   getState(): AdvisorState {
@@ -76,7 +89,7 @@ export class AdvisorEngine {
   }
 
   /** Record the user's answer and advance the interview loop. */
-  submitAnswer(value: Answer["value"], skipped = false): AdvisorState {
+  async submitAnswer(value: Answer["value"], skipped = false): Promise<AdvisorState> {
     const question = this.state.currentQuestion;
     if (!question || this.state.phase !== "interviewing") return this.state;
 
@@ -92,31 +105,9 @@ export class AdvisorEngine {
     this.state.currentQuestion = null;
 
     // Research Agent pass: mine the free-text self-description for the
-    // user's field. A confident match answers the role question for them.
+    // user's field. Live model first, keyword lexicon as fallback.
     if (question.field === "selfDescription" && typeof value === "string" && !skipped) {
-      const matches = matchRoles(value);
-      if (matches.length > 0) {
-        this.personalContext = {
-          phrase: matches[0].matchedPhrase,
-          suggestedRoleIds: matches.map((m) => m.roleId),
-        };
-        const top = matches[0];
-        const label = this.state.graph.nodes.get(top.roleId)?.label ?? top.roleId;
-        if (top.score >= AUTO_ASSIGN_SCORE) {
-          this.state.answers.push({
-            questionId: `auto-role-${question.id}`,
-            field: "role",
-            type: "single-choice",
-            value: [top.roleId],
-            answeredAt: Date.now(),
-          });
-          this.trace("research", `זוהה תחום מהתיאור החופשי: ${label} ("${top.matchedPhrase}")`);
-        } else {
-          this.trace("research", `התיאור מרמז על ${label} — נוודא בשאלה הבאה`);
-        }
-      } else {
-        this.trace("research", "התיאור החופשי לא זוהה בלקסיקון — נשאל על התחום ישירות");
-      }
+      await this.analyzeSelfDescription(question.id, value);
     }
 
     // A clarification answer resolves its contradiction.
@@ -141,21 +132,93 @@ export class AdvisorEngine {
       `ביטחון כולל: ${Math.round(this.state.confidence.overall * 100)}%`,
     );
 
-    this.askNext();
+    const next = this.pickNext();
+    if (next === "synthesize") {
+      await this.synthesize();
+    } else if (this.state.currentQuestion) {
+      await this.personalizeCurrentQuestion();
+    }
     return this.state;
   }
 
-  /** Interview loop step: clarification > next gap question > synthesis. */
-  private askNext() {
+  /** Understand the user's own words — live model with lexicon fallback. */
+  private async analyzeSelfDescription(questionId: string, text: string) {
+    if (isLLMConfigured()) {
+      const analysis = await analyzeSelfDescriptionLLM(text, this.state.graph);
+      if (analysis) {
+        this.personalContext = {
+          phrase: analysis.phrase ?? undefined,
+          suggestedRoleIds: analysis.roleId ? [analysis.roleId] : [],
+        };
+        if (analysis.roleId) {
+          const label = this.state.graph.nodes.get(analysis.roleId)?.label ?? analysis.roleId;
+          this.state.answers.push({
+            questionId: `auto-role-${questionId}`,
+            field: "role",
+            type: "single-choice",
+            value: [analysis.roleId],
+            answeredAt: Date.now(),
+          });
+          this.trace("research", `המודל זיהה תחום מהתיאור: ${label} — ${analysis.summary}`);
+        } else {
+          this.trace("research", `המודל ניתח את התיאור (${analysis.summary}) אך לא זיהה תחום חד-משמעי`);
+        }
+        if (analysis.painIds.length > 0) {
+          this.state.answers.push({
+            questionId: `auto-pains-${questionId}`,
+            field: "pains",
+            type: "multi-choice",
+            value: analysis.painIds,
+            answeredAt: Date.now(),
+          });
+          this.trace(
+            "research",
+            `המודל זיהה חסמים שכבר עלו בתיאור: ${analysis.painIds
+              .map((id) => this.state.graph.nodes.get(id)?.label ?? id)
+              .join(", ")}`,
+          );
+        }
+        return;
+      }
+      this.trace("research", "קריאת המודל נכשלה — עוברים לזיהוי מבוסס לקסיקון");
+    }
+
+    // Rule-based fallback: keyword lexicon.
+    const matches = matchRoles(text);
+    if (matches.length > 0) {
+      this.personalContext = {
+        phrase: matches[0].matchedPhrase,
+        suggestedRoleIds: matches.map((m) => m.roleId),
+      };
+      const top = matches[0];
+      const label = this.state.graph.nodes.get(top.roleId)?.label ?? top.roleId;
+      if (top.score >= AUTO_ASSIGN_SCORE) {
+        this.state.answers.push({
+          questionId: `auto-role-${questionId}`,
+          field: "role",
+          type: "single-choice",
+          value: [top.roleId],
+          answeredAt: Date.now(),
+        });
+        this.trace("research", `זוהה תחום מהתיאור החופשי: ${label} ("${top.matchedPhrase}")`);
+      } else {
+        this.trace("research", `התיאור מרמז על ${label} — נוודא בשאלה הבאה`);
+      }
+    } else {
+      this.trace("research", "התיאור החופשי לא זוהה בלקסיקון — נשאל על התחום ישירות");
+    }
+  }
+
+  /**
+   * Interview loop step: clarification > next gap question > synthesis.
+   * Pure decision logic — no LLM calls here.
+   */
+  private pickNext(): "question" | "synthesize" {
     // 1. Unresolved contradictions get a clarification question first.
     const open = this.state.contradictions.find(
       (c) => !c.resolved && ![...this.pendingClarifications.values()].includes(c.id),
     );
-    const alreadyAskedFor = new Set(
-      this.state.answers
-        .map((a) => this.clarifiedContradiction(a.questionId))
-        .filter(Boolean),
-    );
+    const alreadyAskedFor = new Set(this.clarificationLog.values());
     if (open && !alreadyAskedFor.has(open.id) && this.state.questionCount < MAX_QUESTIONS) {
       const q = generateClarification(open);
       this.pendingClarifications.set(q.id, open.id);
@@ -164,7 +227,7 @@ export class AdvisorEngine {
       this.state.questionCount += 1;
       this.trace("consistency", `זוהתה סתירה: ${open.description}`);
       this.trace("interview", "נשלחה שאלת הבהרה");
-      return;
+      return "question";
     }
 
     // 2. Information gaps drive the next regular question.
@@ -190,20 +253,41 @@ export class AdvisorEngine {
       this.state.currentQuestion = q;
       this.state.questionCount += 1;
       this.trace("interview", `שאלה חדשה על "${q.field}" (${q.type})`);
-      return;
+      return "question";
     }
 
-    // 3. Nothing left to ask — move to synthesis.
-    this.synthesize();
+    return "synthesize";
   }
 
-  private clarificationLog = new Map<string, string>();
-  private clarifiedContradiction(questionId: string): string | undefined {
-    return this.clarificationLog.get(questionId);
+  /** Let the live model rephrase the pending question conversationally. */
+  private async personalizeCurrentQuestion() {
+    const q = this.state.currentQuestion;
+    if (!q || !isLLMConfigured()) return;
+
+    const selfDesc = this.state.answers.find(
+      (a) => a.field === "selfDescription" && !a.skipped,
+    );
+    if (!selfDesc || typeof selfDesc.value !== "string") return;
+
+    const roleAnswer = this.state.answers.find((a) => a.field === "role" && !a.skipped);
+    const roleId = Array.isArray(roleAnswer?.value) ? roleAnswer.value[0] : undefined;
+    const roleLabel = roleId ? this.state.graph.nodes.get(roleId)?.label ?? "" : "";
+
+    const phrased = await personalizeQuestionLLM(q, {
+      selfDescription: selfDesc.value,
+      roleLabel,
+      phrase: this.personalContext.phrase ?? null,
+      questionNumber: this.state.questionCount,
+    });
+    if (phrased && this.state.currentQuestion?.id === q.id) {
+      q.text = phrased.text;
+      if (phrased.hint) q.hint = phrased.hint;
+      this.trace("interview", "השאלה נוסחה מחדש על ידי המודל");
+    }
   }
 
   /** Synthesis pipeline with the critic and quality loops. */
-  private synthesize() {
+  private async synthesize() {
     this.state.phase = "synthesizing";
 
     const persona = buildPersona(
@@ -292,11 +376,16 @@ export class AdvisorEngine {
       qualityRounds,
     };
 
+    // Live-model touch: a personal narrative that ties it all together.
+    if (isLLMConfigured()) {
+      const narrative = await generateNarrativeLLM(report, persona);
+      if (narrative) {
+        report.narrative = narrative;
+        this.trace("recommendation", "המודל כתב סיכום אישי לדוח");
+      }
+    }
+
     this.state.report = report;
     this.state.phase = "done";
   }
-}
-
-export function currentQuestion(state: AdvisorState): Question | null {
-  return state.currentQuestion;
 }
