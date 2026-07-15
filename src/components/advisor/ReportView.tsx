@@ -8,7 +8,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Lightbulb, RotateCcw, Target, Wrench } from "lucide-react";
+import { CheckCircle2, Lightbulb, RotateCcw, Sparkles, Target, Wrench } from "lucide-react";
 import type { AdvisorReport } from "@/advisor/types";
 
 const STYLE_LABELS: Record<string, string> = {
@@ -70,6 +70,21 @@ const ReportView = ({ report, onRestart }: ReportViewProps) => {
           )}
         </CardContent>
       </Card>
+
+      {/* Personal narrative from the live model */}
+      {report.narrative && (
+        <Card className="border-primary/40">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-primary" />
+              כמה מילים ממני אליך
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm leading-relaxed whitespace-pre-line">{report.narrative}</p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Task map */}
       <Card>

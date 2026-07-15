@@ -1,22 +1,27 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Sparkles } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { useAdvisor } from "@/advisor/useAdvisor";
 import { MAX_QUESTIONS } from "@/advisor/orchestrator";
+import { isLLMConfigured } from "@/advisor/llm/config";
 import QuestionCard from "@/components/advisor/QuestionCard";
 import AgentPanel from "@/components/advisor/AgentPanel";
 import ReportView from "@/components/advisor/ReportView";
+import LLMSettings from "@/components/advisor/LLMSettings";
 
 /**
  * Personal AI Advisor: a multi-agent system that interviews the user,
  * builds a persona, and produces a personalized 30-60-90 learning plan
- * with tool recommendations.
+ * with tool recommendations. With a Claude API key configured, the
+ * interview and report are driven by the live model.
  */
 const Advisor = () => {
   const [started, setStarted] = useState(false);
-  const { state, submitAnswer, restart } = useAdvisor();
+  const [, setSettingsVersion] = useState(0);
+  const { state, submitAnswer, restart, busy } = useAdvisor();
+  const refreshSettings = useCallback(() => setSettingsVersion((v) => v + 1), []);
 
   return (
     <main className="min-h-screen bg-background pt-24 pb-16">
@@ -40,9 +45,17 @@ const Advisor = () => {
               <li>⚖️ סוכן עקביות מזהה סתירות ומבקש הבהרות</li>
               <li>🎯 סוכני ביקורת ואיכות בודקים כל המלצה לפני שהיא מגיעה אליך</li>
             </ul>
-            <Button size="lg" onClick={() => setStarted(true)}>
-              מתחילים את הראיון
-            </Button>
+            <div className="flex flex-col items-center gap-3">
+              <Button size="lg" onClick={() => setStarted(true)}>
+                מתחילים את הראיון
+              </Button>
+              <LLMSettings onChange={refreshSettings} />
+              {!isLLMConfigured() && (
+                <p className="text-xs text-muted-foreground">
+                  טיפ: חיבור מפתח Claude API הופך את הראיון לשיחה חכמה באמת.
+                </p>
+              )}
+            </div>
           </motion.section>
         ) : state.phase === "done" && state.report ? (
           <ReportView report={state.report} onRestart={restart} />
@@ -56,12 +69,26 @@ const Advisor = () => {
                 </div>
                 <Progress value={(state.questionCount / MAX_QUESTIONS) * 100} />
               </div>
-              {state.currentQuestion && (
-                <QuestionCard
-                  key={state.currentQuestion.id}
-                  question={state.currentQuestion}
-                  onAnswer={submitAnswer}
-                />
+              {busy ? (
+                <div
+                  dir="rtl"
+                  className="flex items-center justify-center gap-3 py-16 text-muted-foreground"
+                >
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>
+                    {state.phase === "synthesizing" || state.gaps.length === 0
+                      ? "הסוכנים מנתחים ובונים את התוכנית שלך..."
+                      : "היועץ חושב על השאלה הבאה..."}
+                  </span>
+                </div>
+              ) : (
+                state.currentQuestion && (
+                  <QuestionCard
+                    key={state.currentQuestion.id}
+                    question={state.currentQuestion}
+                    onAnswer={submitAnswer}
+                  />
+                )
               )}
             </div>
             <AgentPanel state={state} />

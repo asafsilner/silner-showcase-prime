@@ -230,6 +230,8 @@ export interface QualityReport {
 
 export interface AdvisorReport {
   persona: PersonaProfile;
+  /** Personal narrative written by the LLM (present only in live-model mode). */
+  narrative?: string;
   taskMap: { taskId: string; label: string; painLabels: string[] }[];
   opportunities: Opportunity[];
   recommendations: Recommendation[];
