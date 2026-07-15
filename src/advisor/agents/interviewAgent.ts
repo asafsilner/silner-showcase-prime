@@ -62,29 +62,64 @@ function painsForTasks(graph: KnowledgeGraph, taskIds: string[]): QuestionOption
   return fallback.map((p) => ({ id: p.id, label: p.label }));
 }
 
+/** What the orchestrator learned about the person from free text. */
+export interface PersonalContext {
+  /** The user's own words that identified their field (e.g. "יוגה"). */
+  phrase?: string;
+  /** Role ids the matcher considered likely, best first. */
+  suggestedRoleIds?: string[];
+}
+
+/** "בתחום שלך (יוגה)" — safe personalization without Hebrew inflection. */
+function personalTag(context: PersonalContext): string {
+  return context.phrase ? ` (${context.phrase})` : "";
+}
+
 export function generateQuestion(
   gap: InformationGap,
   graph: KnowledgeGraph,
   answers: Answer[],
+  context: PersonalContext = {},
 ): Question {
   const id = nextId();
   switch (gap.field) {
-    case "role":
+    case "selfDescription":
+      return {
+        id,
+        field: "selfDescription",
+        type: "open-text",
+        text: "נעים להכיר! לפני הכול — ספרו לי במילים שלכם: מה אתם עושים, ואיך נראה יום עבודה טיפוסי שלכם?",
+        hint: "אין תשובה נכונה. כמה משפטים חופשיים — מזה אבנה את שאר השיחה במיוחד בשבילך.",
+      };
+    case "role": {
+      const suggested = context.suggestedRoleIds ?? [];
+      const allRoles = nodesOfKind(graph, "role");
+      const ordered = [
+        ...suggested.map((rid) => allRoles.find((r) => r.id === rid)).filter((r): r is NonNullable<typeof r> => !!r),
+        ...allRoles.filter((r) => !suggested.includes(r.id)),
+      ];
       return {
         id,
         field: "role",
         type: "single-choice",
-        text: "נעים להכיר! כדי שאבין את עולם העבודה שלך — איזה תחום הכי קרוב למה שאתם עושים ביום־יום?",
-        hint: "אם שום אפשרות לא מדויקת, אפשר לבחור 'אחר' ולכתוב במילים שלך.",
-        options: nodesOfKind(graph, "role").map((r) => ({ id: r.id, label: r.label })),
+        text:
+          suggested.length > 0
+            ? "מהתיאור שלך אני לא בטוח במאה אחוז — איזה מהתחומים האלה הכי קרוב למה שאתם עושים?"
+            : "כדי שאבין את עולם העבודה שלך — איזה תחום הכי קרוב למה שאתם עושים ביום־יום?",
+        hint: "בחרו את הקרוב ביותר — נדייק את השאר בשאלות הבאות.",
+        options: ordered.map((r) => ({
+          id: r.id,
+          label: r.description ? `${r.label} — ${r.description}` : r.label,
+        })),
       };
+    }
     case "tasks": {
       const roleId = asIds(findAnswer(answers, "role")?.value)[0];
       return {
         id,
         field: "tasks",
         type: "ranking",
-        text: "מתוך המשימות האלה, סדרו אותן לפי כמה זמן הן באמת לוקחות לכם בשבוע — מהגוזלת ביותר ומטה.",
+        text: `מתוך המשימות האלה, סדרו אותן לפי כמה זמן הן באמת לוקחות לכם בשבוע בתחום שלכם${personalTag(context)} — מהגוזלת ביותר ומטה.`,
         hint: "אפשר להשאיר בחוץ משימות שלא רלוונטיות בכלל.",
         options: tasksForRole(graph, roleId),
       };
@@ -95,7 +130,7 @@ export function generateQuestion(
         id,
         field: "pains",
         type: "multi-choice",
-        text: "איפה זה הכי כואב? סמנו את הדברים שהכי מתסכלים או מעכבים אתכם בעבודה.",
+        text: `איפה זה הכי כואב בעבודה שלכם${personalTag(context)}? סמנו את הדברים שהכי מתסכלים או מעכבים אתכם.`,
         options: painsForTasks(graph, taskIds),
       };
     }

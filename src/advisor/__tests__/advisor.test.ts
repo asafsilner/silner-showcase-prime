@@ -9,6 +9,7 @@ import { detectOpportunities } from "../agents/opportunityDetector";
 import { generateRecommendations } from "../agents/recommendationAgent";
 import { buildCurriculum } from "../agents/curriculumBuilder";
 import { assessCurriculum } from "../agents/qualityAgent";
+import { AUTO_ASSIGN_SCORE, matchRoles } from "../knowledge/roleMatcher";
 import type { Answer, Question } from "../types";
 
 function makeAnswer(field: Answer["field"], value: Answer["value"], id = `a-${field}`): Answer {
@@ -18,6 +19,8 @@ function makeAnswer(field: Answer["field"], value: Answer["value"], id = `a-${fi
 /** Answer whatever question the engine asks, like a cooperative user. */
 function autoAnswer(question: Question): Answer["value"] {
   switch (question.field) {
+    case "selfDescription":
+      return "אני עובד בחברת הייטק על תיאום בין צוותים"; // no lexicon hit on purpose
     case "role":
       return ["role-pm"];
     case "tasks":
@@ -40,13 +43,25 @@ function autoAnswer(question: Question): Answer["value"] {
 }
 
 describe("Information Gap Agent", () => {
-  it("prioritizes role first, then unlocks dependent fields", () => {
+  it("prioritizes the self-description first, then unlocks dependent fields", () => {
     const before = findInformationGaps([]);
-    expect(before[0].field).toBe("role");
+    expect(before[0].field).toBe("selfDescription");
 
-    const after = findInformationGaps([makeAnswer("role", ["role-pm"])]);
+    const after = findInformationGaps([
+      makeAnswer("selfDescription", "אני מנהל מוצר"),
+      makeAnswer("role", ["role-pm"]),
+    ]);
     expect(after.find((g) => g.field === "role")).toBeUndefined();
     expect(after[0].field).toBe("tasks");
+  });
+
+  it("still asks about the role when the self-description was skipped", () => {
+    const answers: Answer[] = [
+      { ...makeAnswer("selfDescription", []), skipped: true },
+    ];
+    const gaps = findInformationGaps(answers);
+    expect(gaps[0].field).toBe("role");
+    expect(gaps[0].priority).toBeGreaterThan(0.5);
   });
 
   it("deprioritizes skipped fields instead of nagging", () => {
@@ -140,12 +155,69 @@ describe("Synthesis pipeline", () => {
   });
 });
 
+describe("Role Matcher", () => {
+  it("identifies a yoga teacher from free text with a confident score", () => {
+    const matches = matchRoles("אני מדריכת יוגה, מעבירה שיעורים בסטודיו ובזום");
+    expect(matches[0].roleId).toBe("role-coach");
+    expect(matches[0].score).toBeGreaterThanOrEqual(AUTO_ASSIGN_SCORE);
+  });
+
+  it("returns weak or empty matches for vague text", () => {
+    const matches = matchRoles("אני עושה כל מיני דברים");
+    expect(matches.filter((m) => m.score >= AUTO_ASSIGN_SCORE)).toHaveLength(0);
+  });
+});
+
+describe("Personalized interview (yoga teacher)", () => {
+  it("skips the role question and offers person-relevant tasks and pains", () => {
+    const engine = new AdvisorEngine();
+    let state = engine.getState();
+    expect(state.currentQuestion?.field).toBe("selfDescription");
+
+    state = engine.submitAnswer("אני מדריכת יוגה עצמאית, מלמדת בסטודיו קטן");
+
+    // Role was auto-assigned by the Research Agent — no role question.
+    expect(state.currentQuestion?.field).toBe("tasks");
+    const taskLabels = state.currentQuestion!.options!.map((o) => o.label);
+    // The first (strongest) options are coach-life tasks, not office tasks.
+    expect(taskLabels[0]).toContain("פרונטלית");
+    expect(taskLabels.slice(0, 5).join(" ")).toContain("לקוחות");
+    // The question is phrased with the user's own words.
+    expect(state.currentQuestion!.text).toContain("יוגה");
+
+    state = engine.submitAnswer(["task-inperson", "task-clients", "task-social"]);
+    expect(state.currentQuestion?.field).toBe("pains");
+    const painLabels = state.currentQuestion!.options!.map((o) => o.label);
+    expect(painLabels.join(" ")).toContain("תיאומים");
+    expect(painLabels.join(" ")).toContain("רשתות");
+  });
+
+  it("produces coach-relevant recommendations end-to-end", () => {
+    const engine = new AdvisorEngine();
+    let state = engine.getState();
+    let guard = 0;
+    while (state.phase === "interviewing" && state.currentQuestion && guard < 25) {
+      const q = state.currentQuestion;
+      if (q.field === "selfDescription") state = engine.submitAnswer("אני מדריכת יוגה עצמאית");
+      else if (q.field === "tasks") state = engine.submitAnswer(["task-inperson", "task-clients", "task-social"]);
+      else if (q.field === "pains") state = engine.submitAnswer(["pain-scheduling", "pain-selfmarketing"]);
+      else state = engine.submitAnswer(autoAnswer(q));
+      guard += 1;
+    }
+    expect(state.phase).toBe("done");
+    const report = state.report!;
+    expect(report.persona.roleLabel).toContain("אימון");
+    const recTitles = report.recommendations.map((r) => r.title).join(" ");
+    expect(recTitles).toMatch(/Calendly|WhatsApp|Canva/);
+  });
+});
+
 describe("AdvisorEngine end-to-end", () => {
   it("interviews, synthesizes, and produces a full report", () => {
     const engine = new AdvisorEngine();
     let state = engine.getState();
     expect(state.phase).toBe("interviewing");
-    expect(state.currentQuestion?.field).toBe("role");
+    expect(state.currentQuestion?.field).toBe("selfDescription");
 
     let guard = 0;
     while (state.phase === "interviewing" && state.currentQuestion && guard < 25) {

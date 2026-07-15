@@ -33,6 +33,9 @@ export function buildPersona(
   const roleId = asArray(answerOf(answers, "role")?.value)[0] ?? null;
   const roleLabel = roleId ? graph.nodes.get(roleId)?.label ?? roleId : "לא ידוע";
 
+  const selfDescRaw = answerOf(answers, "selfDescription")?.value;
+  const selfDescription = typeof selfDescRaw === "string" ? selfDescRaw : "";
+
   const styleRaw = asArray(answerOf(answers, "learningStyle")?.value)[0];
   const learningStyle: LearningStyle = LEARNING_STYLES.includes(styleRaw as LearningStyle)
     ? (styleRaw as LearningStyle)
@@ -43,6 +46,7 @@ export function buildPersona(
   const goalsRaw = answerOf(answers, "goals")?.value;
 
   return {
+    selfDescription,
     roleId,
     roleLabel,
     taskIds: asArray(answerOf(answers, "tasks")?.value).filter((id) => graph.nodes.has(id)),

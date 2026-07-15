@@ -19,7 +19,8 @@ const AGENT_LABELS: Record<AgentName, string> = {
 };
 
 const FIELD_LABELS: Record<string, string> = {
-  role: "תפקיד",
+  selfDescription: "תיאור אישי",
+  role: "תחום עיסוק",
   tasks: "משימות",
   pains: "חסמים",
   toolsUsed: "כלים קיימים",

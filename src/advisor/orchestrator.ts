@@ -23,7 +23,12 @@ import {
   findInformationGaps,
   hasActionableGaps,
 } from "./agents/informationGapAgent";
-import { generateClarification, generateQuestion } from "./agents/interviewAgent";
+import {
+  generateClarification,
+  generateQuestion,
+  type PersonalContext,
+} from "./agents/interviewAgent";
+import { AUTO_ASSIGN_SCORE, matchRoles } from "./knowledge/roleMatcher";
 import { detectContradictions } from "./agents/consistencyAgent";
 import { CONFIDENCE_THRESHOLD, scoreConfidence } from "./agents/confidenceAgent";
 import { buildPersona } from "./agents/personaBuilder";
@@ -41,6 +46,8 @@ export class AdvisorEngine {
   private state: AdvisorState;
   /** clarification question id -> contradiction id */
   private pendingClarifications = new Map<string, string>();
+  /** What the Research Agent learned from the user's own words. */
+  private personalContext: PersonalContext = {};
 
   constructor() {
     const graph = buildKnowledgeGraph();
@@ -83,6 +90,34 @@ export class AdvisorEngine {
     };
     this.state.answers.push(answer);
     this.state.currentQuestion = null;
+
+    // Research Agent pass: mine the free-text self-description for the
+    // user's field. A confident match answers the role question for them.
+    if (question.field === "selfDescription" && typeof value === "string" && !skipped) {
+      const matches = matchRoles(value);
+      if (matches.length > 0) {
+        this.personalContext = {
+          phrase: matches[0].matchedPhrase,
+          suggestedRoleIds: matches.map((m) => m.roleId),
+        };
+        const top = matches[0];
+        const label = this.state.graph.nodes.get(top.roleId)?.label ?? top.roleId;
+        if (top.score >= AUTO_ASSIGN_SCORE) {
+          this.state.answers.push({
+            questionId: `auto-role-${question.id}`,
+            field: "role",
+            type: "single-choice",
+            value: [top.roleId],
+            answeredAt: Date.now(),
+          });
+          this.trace("research", `זוהה תחום מהתיאור החופשי: ${label} ("${top.matchedPhrase}")`);
+        } else {
+          this.trace("research", `התיאור מרמז על ${label} — נוודא בשאלה הבאה`);
+        }
+      } else {
+        this.trace("research", "התיאור החופשי לא זוהה בלקסיקון — נשאל על התחום ישירות");
+      }
+    }
 
     // A clarification answer resolves its contradiction.
     const contradictionId = this.pendingClarifications.get(question.id);
@@ -146,7 +181,12 @@ export class AdvisorEngine {
     const gapsRemain = hasActionableGaps(this.state.gaps);
 
     if (gapsRemain && !budgetSpent && !(confident && this.state.gaps[0].priority < 0.5)) {
-      const q = generateQuestion(this.state.gaps[0], this.state.graph, this.state.answers);
+      const q = generateQuestion(
+        this.state.gaps[0],
+        this.state.graph,
+        this.state.answers,
+        this.personalContext,
+      );
       this.state.currentQuestion = q;
       this.state.questionCount += 1;
       this.trace("interview", `שאלה חדשה על "${q.field}" (${q.type})`);
