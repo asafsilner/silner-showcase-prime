@@ -161,6 +161,7 @@ const ProjectPage = () => {
           </motion.section>
 
           {/* Video Showcase */}
+          {project.media.videos.length > 0 && (
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -218,6 +219,7 @@ const ProjectPage = () => {
               </div>
             )}
           </motion.section>
+          )}
 
           {/* Photo Gallery */}
           {project.media.gallery.length > 0 && (
