@@ -1,3 +1,8 @@
+// --- LIVE DEMO CONFIGURATION ---
+const liveDemos = {
+  gestureFaceEngine: "/gesture-face-engine/index.html",
+};
+
 // --- VIDEO CONFIGURATION ---
 const videoIds = {
   hotWheels: ["VH-5zhuq2Sg", "mJu_KE3-S58", "Q4c-WBZGtD8", "A37r3bsftKQ", "XPJfcIwU-4c", "sEDSdMfwF7Q", "NKXsIXXrKvA", "ILhKByohHD4", "FMUidYlOENc", "3fG86gipBq8", "tbN8tKp_ZBA", "w2IEXt6ldvo", "xEfCrOfvP8g"],
@@ -19,6 +24,7 @@ const videoIds = {
 
 // --- THUMBNAIL CONFIGURATION ---
 const projectImages = {
+  gestureFaceEngine: "/projects/gesture-face-engine.svg",
   hotWheels: "/projects/hot-wheels.jpg",
   jimi: "/projects/jimi-hendrix.jpg",
   railway: "/projects/vr-railway.jpg",
@@ -49,6 +55,7 @@ export interface ProjectMedia {
   video: string; // primary video embed
   videos: VideoItem[];
   gallery: string[];
+  liveDemo?: string;
 }
 
 export interface ProjectContent {
@@ -75,6 +82,39 @@ export interface Project {
 }
 
 export const projectsData: Project[] = [
+  {
+    id: "gesture-face-engine",
+    title: "Gesture & Face Filter Engine",
+    tagline: "Real-time CNN face expression recognition and multi-gesture hand tracking with live canvas visual effects — running entirely in the browser.",
+    role: "Creative Technologist & Engineer",
+    team: "Solo",
+    duration: "1 Week",
+    platform: "Browser / WebRTC",
+    tools: ["MediaPipe", "Canvas2D", "WebRTC", "Tailwind CSS"],
+    media: {
+      thumbnail: projectImages.gestureFaceEngine,
+      hero: projectImages.gestureFaceEngine,
+      video: "",
+      videos: [],
+      gallery: [],
+      liveDemo: liveDemos.gestureFaceEngine,
+    },
+    responsibilities: [
+      "Built a dual-pipeline MediaPipe system processing hand landmarks and face mesh on interleaved frames to maintain high FPS.",
+      "Implemented CNN-based expression classification (happy, sad, angry, sick) using facial geometry ratios from 468 mesh landmarks.",
+      "Designed gesture recognition for 6 hand poses plus a two-hand heart gesture that spawns animated floating hearts.",
+      "Created 4 real-time canvas filter effects: Bayer dither, VHS chromatic aberration, spotlight vignette, and water ripple.",
+      "Built a bubble particle system spawned from the fingertip with thumbs-up pop mechanic.",
+    ],
+    content: {
+      problem: "Demonstrating real-time computer vision capabilities entirely client-side — no server, no ML backend — using only the browser's camera and WebGL-accelerated MediaPipe models.",
+      solution: "An interleaved dual-model pipeline: hand landmarks run on even frames, face mesh on odd frames, keeping GPU load balanced. Expression state drives a full-screen color tint overlay; gesture state selects one of four canvas post-processing filters or spawns particle systems.",
+      coreLoop: "Camera Feed -> MediaPipe Inference -> Gesture/Expression Classify -> Canvas Filter -> Particle Spawn",
+      systems: "Interleaved frame processing (hands on even frames, face mesh on odd frames) maintains ~30 FPS. Bayer ordered dithering, multi-channel VHS aberration via screen-blend composite, radial gradient spotlight, and horizontal slice wave distortion.",
+      uxFlow: "Camera Permission -> Model Load -> Live View with HUD -> Expression Tint Active -> Gesture Filter Active -> Particle Effects.",
+      outcome: "A fully client-side real-time AR filter demo showcasing MediaPipe's hand and face models with zero backend dependencies, running at 25–45 FPS on modern mobile and desktop browsers.",
+    },
+  },
   {
     id: "hot-wheels",
     title: "Hot Wheels Champion Experience",

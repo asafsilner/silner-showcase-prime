@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Users, Clock, Monitor, Wrench, Play, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Users, Clock, Monitor, Wrench, Play, X, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { getProjectById, projectsData } from "@/data/projects";
 import { Button } from "@/components/ui/button";
 
@@ -160,7 +160,42 @@ const ProjectPage = () => {
             </div>
           </motion.section>
 
+          {/* Live Demo */}
+          {project.media.liveDemo && (
+            <motion.section
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-display text-2xl md:text-3xl font-bold">
+                  <span className="text-gold-gradient">Live Demo</span>
+                </h2>
+                <Button asChild variant="outline" size="sm" className="gap-2">
+                  <a href={project.media.liveDemo} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4" />
+                    Open Full Screen
+                  </a>
+                </Button>
+              </div>
+              <div className="relative rounded-lg overflow-hidden bg-card border border-border" style={{ aspectRatio: "16/9" }}>
+                <iframe
+                  src={project.media.liveDemo}
+                  title={`${project.title} — Live Demo`}
+                  className="absolute inset-0 w-full h-full"
+                  allow="camera; microphone"
+                  sandbox="allow-scripts allow-same-origin allow-forms"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-3 text-center">
+                Camera permission required · Runs entirely in-browser · No data is uploaded
+              </p>
+            </motion.section>
+          )}
+
           {/* Video Showcase */}
+          {project.media.videos.length > 0 && (
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -218,6 +253,7 @@ const ProjectPage = () => {
               </div>
             )}
           </motion.section>
+          )}
 
           {/* Photo Gallery */}
           {project.media.gallery.length > 0 && (

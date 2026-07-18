@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gesture & Face Filter Engine</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- MediaPipe dependencies -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <style>
+    body {
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+  </style>
+</head>
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col font-sans overflow-hidden">
+
+  <!-- Header and Status Panel -->
+  <header class="p-3 bg-neutral-900 border-b border-neutral-800 z-10 flex flex-row justify-between items-center gap-2">
+    <div>
+      <h1 class="text-sm font-bold tracking-tight sm:text-lg">Gesture & Face Engine</h1>
+      <p class="text-[10px] text-neutral-400">Expression tint and heart gesture tracking</p>
+    </div>
+    <div class="flex items-center gap-2 text-[10px] sm:text-xs">
+      <div id="status-indicator" class="px-2 py-0.5 rounded bg-yellow-950 text-yellow-400 border border-yellow-800 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse"></span>
+        <span id="status-text">Starting...</span>
+      </div>
+      <div class="px-2 py-0.5 rounded bg-neutral-800 border border-neutral-700 text-neutral-300">
+        FPS: <span id="fps-counter" class="font-mono font-bold">0</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="flex-1 relative flex items-center justify-center bg-black overflow-hidden">
+    <!-- Main Render Canvas -->
+    <canvas id="output-canvas" class="w-full h-full object-contain max-h-[70vh] sm:max-h-[80vh]"></canvas>
+
+    <!-- UI Overlay for Instructions -->
+    <div class="absolute bottom-4 left-4 right-4 pointer-events-none flex flex-col items-center gap-3">
+      <!-- Active State Display -->
+      <div id="state-pill" class="bg-neutral-900/95 border border-neutral-800 px-3 py-1.5 rounded-full shadow-2xl backdrop-blur flex flex-col items-center gap-1 transition-transform duration-200">
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] uppercase tracking-widest text-neutral-400 font-semibold">Expression:</span>
+          <span id="active-expression-name" class="text-xs font-bold text-white">Detecting Face...</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-[9px] uppercase tracking-widest text-neutral-400 font-semibold">Filter:</span>
+          <span id="active-filter-name" class="text-xs font-bold text-neutral-300">Detecting Hands...</span>
+        </div>
+      </div>
+
+      <!-- Gestures and Faces Legend Cheat Sheet -->
+      <div class="bg-neutral-900/90 border border-neutral-800 p-2 rounded-lg backdrop-blur grid grid-cols-4 gap-1.5 w-full max-w-lg text-center pointer-events-auto text-[9px]">
+        <div id="legend-sad" class="flex flex-col items-center py-0.5 rounded border border-transparent transition-colors">
+          <span class="font-bold text-neutral-200">&#9785;&#65039; SAD</span>
+          <span class="text-neutral-400 text-[8px]">Blue Tint</span>
+        </div>
+        <div id="legend-angry" class="flex flex-col items-center py-0.5 rounded border border-transparent transition-colors">
+          <span class="font-bold text-neutral-200">&#128544; ANGRY</span>
+          <span class="text-neutral-400 text-[8px]">Red Tint</span>
+        </div>
+        <div id="legend-happy" class="flex flex-col items-center py-0.5 rounded border border-transparent transition-colors">
+          <span class="font-bold text-neutral-200">&#128522; HAPPY</span>
+          <span class="text-neutral-400 text-[8px]">Pink Tint</span>
+        </div>
+        <div id="legend-sick" class="flex flex-col items-center py-0.5 rounded border border-transparent transition-colors">
+          <span class="font-bold text-neutral-200">&#129314; SICK</span>
+          <span class="text-neutral-400 text-[8px]">Green Tint</span>
+        </div>
+        <div id="legend-heart" class="flex flex-col items-center py-0.5 rounded border border-transparent transition-colors col-span-4 border-dashed border-neutral-800 mt-0.5">
+          <span class="font-bold text-neutral-200">&#129782; TWO-HAND HEART GESTURE</span>
+          <span class="text-neutral-400 text-[8px]">Spawns floating hearts</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Alert Banner -->
+    <div id="error-banner" class="hidden absolute top-4 left-4 right-4 mx-auto bg-red-950 border border-red-800 text-red-200 px-4 py-3 rounded-lg shadow-2xl max-w-sm text-center z-50">
+      <h3 class="font-bold text-xs mb-1">Camera Configuration Error</h3>
+      <p id="error-message" class="text-[11px] text-red-300">Could not initialize mobile front camera.</p>
+    </div>
+  </main>
+
+  <!-- Hidden HTML Elements for Source Video and Processing Pipelines -->
+  <video id="webcam-video" class="hidden" autoplay playsinline muted></video>
+  <canvas id="processing-canvas" class="hidden"></canvas>
+  <canvas id="aberration-canvas-r" class="hidden"></canvas>
+  <canvas id="aberration-canvas-g" class="hidden"></canvas>
+  <canvas id="aberration-canvas-b" class="hidden"></canvas>
+
+  <script>
+    const video = document.getElementById('webcam-video');
+    const outCanvas = document.getElementById('output-canvas');
+    const outCtx = outCanvas.getContext('2d');
+    const procCanvas = document.getElementById('processing-canvas');
+    const procCtx = procCanvas.getContext('2d');
+
+    // Channels for Chromatic Aberration
+    const rChan = document.getElementById('aberration-canvas-r');
+    const rCtx = rChan.getContext('2d');
+    const gChan = document.getElementById('aberration-canvas-g');
+    const gCtx = gChan.getContext('2d');
+    const bChan = document.getElementById('aberration-canvas-b');
+    const bCtx = bChan.getContext('2d');
+
+    const statusIndicator = document.getElementById('status-indicator');
+    const statusText = document.getElementById('status-text');
+    const fpsCounter = document.getElementById('fps-counter');
+    const activeExpressionName = document.getElementById('active-expression-name');
+    const activeFilterName = document.getElementById('active-filter-name');
+    const errorBanner = document.getElementById('error-banner');
+    const errorMessage = document.getElementById('error-message');
+
+    let handsDetector = null;
+    let faceMeshDetector = null;
+
+    let activeGesture = 'none';
+    let activeExpression = 'normal';
+
+    let lastGestureTime = 0;
+    let lastExpressionTime = 0;
+
+    let indexFingerPos = { x: 0, y: 0, visible: false };
+    let frameCount = 0;
+    let lastFpsUpdateTime = 0;
+    let animationFrameId = null;
+    let waterRippleOffset = 0;
+    let modelLoading = true;
+    let frameToggle = 0;
+
+    // Hearts and Bubbles State
+    let bubbles = [];
+    let hearts = [];
+    let lastBubbleSpawnTime = 0;
+    let lastHeartSpawnTime = 0;
+    const SPAWN_COOLDOWN = 200;
+
+    // Heart gesture specific coordinates for spawning hearts
+    let heartSpawnPos = { x: 0, y: 0, active: false };
+
+    // Active dimensions
+    let renderW = 640;
+    let renderH = 480;
+
+    function getDistance(p1, p2) {
+      return Math.hypot(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z);
+    }
+
+    function showError(msg) {
+      errorMessage.textContent = msg;
+      errorBanner.classList.remove('hidden');
+      statusIndicator.className = "px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800 flex items-center gap-1.5";
+      statusText.textContent = "Error";
+    }
+
+    // Initialize MediaPipe Models
+    function initModels() {
+      try {
+        // Init Hands (Configured up to 2 hands for heart gesture detection)
+        handsDetector = new Hands({
+          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+        handsDetector.setOptions({
+          maxNumHands: 2,
+          modelComplexity: 1,
+          minDetectionConfidence: 0.55,
+          minTrackingConfidence: 0.55
+        });
+        handsDetector.onResults(onHandResults);
+
+        // Init Face Mesh
+        faceMeshDetector = new FaceMesh({
+          locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+        });
+        faceMeshDetector.setOptions({
+          maxNumFaces: 1,
+          refineLandmarks: false,
+          minDetectionConfidence: 0.55,
+          minTrackingConfidence: 0.55
+        });
+        faceMeshDetector.onResults(onFaceResults);
+
+        statusText.textContent = "Connecting...";
+      } catch (err) {
+        showError("Failed to load tracking frameworks.");
+        console.error(err);
+      }
+    }
+
+    function configureDimensions(videoWidth, videoHeight) {
+      renderW = videoWidth;
+      renderH = videoHeight;
+
+      procCanvas.width = renderW;
+      procCanvas.height = renderH;
+      rChan.width = renderW;
+      rChan.height = renderH;
+      gChan.width = renderW;
+      gChan.height = renderH;
+      bChan.width = renderW;
+      bChan.height = renderH;
+
+      outCanvas.width = renderW;
+      outCanvas.height = renderH;
+    }
+
+    function initCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showError("Camera APIs are blocked or unsupported.");
+        return;
+      }
+
+      const constraints = {
+        video: {
+          facingMode: "user",
+          width: { ideal: 640 },
+          height: { ideal: 640 }
+        },
+        audio: false
+      };
+
+      navigator.mediaDevices.getUserMedia(constraints)
+      .then((stream) => {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play().then(() => {
+            configureDimensions(video.videoWidth, video.videoHeight);
+            startProcessingLoop();
+          }).catch(err => {
+            showError("Tap screen to enable camera.");
+            document.body.addEventListener('click', () => {
+              video.play();
+              configureDimensions(video.videoWidth, video.videoHeight);
+              startProcessingLoop();
+            }, { once: true });
+          });
+        };
+      })
+      .catch((err) => {
+        showError("Selfie camera access denied.");
+        console.error(err);
+      });
+    }
+
+    // Interleaved Frame Processing to maintain high FPS
+    function startProcessingLoop() {
+      statusIndicator.className = "px-2 py-0.5 rounded bg-green-950 text-green-400 border border-green-800 flex items-center gap-1.5";
+      statusText.textContent = "Loading Models...";
+
+      async function renderFrame() {
+        if (video.readyState === video.HAVE_ENOUGH_DATA) {
+          applyFiltersAndRender();
+          calculateFPS();
+
+          try {
+            if (frameToggle % 2 === 0) {
+              if (handsDetector) {
+                await handsDetector.send({ image: video });
+              }
+            } else {
+              if (faceMeshDetector) {
+                await faceMeshDetector.send({ image: video });
+              }
+            }
+            frameToggle++;
+
+            if (modelLoading) {
+              modelLoading = false;
+              statusText.textContent = "Active";
+            }
+          } catch (err) {
+            console.error("Frame processing step failed:", err);
+          }
+        }
+        animationFrameId = requestAnimationFrame(renderFrame);
+      }
+      renderFrame();
+    }
+
+    function onHandResults(results) {
+      if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+        if (Date.now() - lastGestureTime > 1000) {
+          activeGesture = 'none';
+          indexFingerPos.visible = false;
+          heartSpawnPos.active = false;
+        }
+        return;
+      }
+
+      const landmarksCount = results.multiHandLandmarks.length;
+
+      // Index tip tracking uses Hand 0
+      const landmarks0 = results.multiHandLandmarks[0];
+      const rawIndexTip = landmarks0[8];
+      indexFingerPos.x = (1 - rawIndexTip.x) * outCanvas.width;
+      indexFingerPos.y = rawIndexTip.y * outCanvas.height;
+      indexFingerPos.visible = true;
+
+      if (landmarksCount === 2) {
+        // Evaluate two-hand heart gesture
+        const landmarks1 = results.multiHandLandmarks[1];
+        classifyTwoHandGesture(landmarks0, landmarks1);
+      } else {
+        // Evaluate single hand gestures
+        classifySingleHandGesture(landmarks0);
+      }
+
+      lastGestureTime = Date.now();
+    }
+
+    function classifySingleHandGesture(landmarks) {
+      const wrist = landmarks[0];
+      const thumbTip = landmarks[4];
+      const indexTip = landmarks[8];
+      const middleTip = landmarks[12];
+      const ringTip = landmarks[16];
+      const pinkyTip = landmarks[20];
+
+      const thumbMcp = landmarks[2];
+      const indexMcp = landmarks[5];
+      const middleMcp = landmarks[9];
+      const ringMcp = landmarks[13];
+      const pinkyMcp = landmarks[17];
+
+      const handScale = getDistance(wrist, middleMcp);
+
+      const indexExt = getDistance(indexTip, wrist) > getDistance(indexMcp, wrist) * 1.35;
+      const middleExt = getDistance(middleTip, wrist) > getDistance(middleMcp, wrist) * 1.35;
+      const ringExt = getDistance(ringTip, wrist) > getDistance(ringMcp, wrist) * 1.35;
+      const pinkyExt = getDistance(pinkyTip, wrist) > getDistance(pinkyMcp, wrist) * 1.35;
+
+      const thumbIndexDist = getDistance(thumbTip, indexTip);
+      const isOkSign = (thumbIndexDist < handScale * 0.4) && middleExt && ringExt && pinkyExt;
+
+      const thumbExt = getDistance(thumbTip, wrist) > getDistance(thumbMcp, wrist) * 1.3;
+      const isThumbsUp = thumbExt && !indexExt && !middleExt && !ringExt && !pinkyExt && (thumbTip.y < thumbMcp.y);
+
+      if (isOkSign) {
+        activeGesture = 'ok';
+      } else if (isThumbsUp) {
+        activeGesture = 'thumbs_up';
+      } else if (!indexExt && !middleExt && !ringExt && !pinkyExt) {
+        activeGesture = 'fist';
+      } else if (indexExt && middleExt && !ringExt && !pinkyExt) {
+        activeGesture = 'peace';
+      } else if (indexExt && !middleExt && !ringExt && !pinkyExt) {
+        activeGesture = 'point';
+      } else if (indexExt && middleExt && ringExt && pinkyExt) {
+        activeGesture = 'open';
+      } else {
+        activeGesture = 'none';
+      }
+
+      heartSpawnPos.active = false;
+    }
+
+    // Detect Heart Shape formed by two hands
+    function classifyTwoHandGesture(landmarks0, landmarks1) {
+      const indexTip0 = landmarks0[8];
+      const thumbTip0 = landmarks0[4];
+      const indexTip1 = landmarks1[8];
+      const thumbTip1 = landmarks1[4];
+
+      const distIndexTips = getDistance(indexTip0, indexTip1);
+      const distThumbTips = getDistance(thumbTip0, thumbTip1);
+      const distWrists = getDistance(landmarks0[0], landmarks1[0]);
+
+      // If index tips and thumb tips are meeting while wrists remain separated, a heart is detected.
+      if (distIndexTips < 0.16 && distThumbTips < 0.16 && distWrists > 0.22) {
+        activeGesture = 'heart';
+
+        // Calculate midpoint for spawning floating hearts
+        const midX = ((1 - indexTip0.x) + (1 - indexTip1.x)) / 2;
+        const midY = (indexTip0.y + indexTip1.y) / 2;
+        heartSpawnPos.x = midX * outCanvas.width;
+        heartSpawnPos.y = midY * outCanvas.height;
+        heartSpawnPos.active = true;
+      } else {
+        // Fall back to scanning hand 0
+        classifySingleHandGesture(landmarks0);
+      }
+    }
+
+    // Face mesh outputs expression evaluation
+    function onFaceResults(results) {
+      if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+        if (Date.now() - lastExpressionTime > 1200) {
+          activeExpression = 'normal';
+        }
+        return;
+      }
+
+      const face = results.multiFaceLandmarks[0];
+
+      // Essential landmarks for geometry
+      const mouthTop = face[13];
+      const mouthBottom = face[14];
+      const mouthLeft = face[61];
+      const mouthRight = face[291];
+
+      const eyebrowLeft = face[107];
+      const eyebrowRight = face[336];
+      const eyeLeft = face[133];
+      const eyeRight = face[362];
+
+      const mouthWidth = getDistance(mouthLeft, mouthRight);
+      const mouthHeight = getDistance(mouthTop, mouthBottom);
+
+      // Height differences to evaluate curves
+      const mouthCenterY = (mouthTop.y + mouthBottom.y) / 2;
+      const mouthCornerY = (mouthLeft.y + mouthRight.y) / 2;
+
+      // Relatives
+      const smileValue = mouthCenterY - mouthCornerY;
+      const openRatio = mouthHeight / Math.max(0.01, mouthWidth);
+
+      // Eyebrow distance
+      const eyebrowDist = getDistance(eyebrowLeft, eyebrowRight);
+      const eyeDist = getDistance(eyeLeft, eyeRight);
+      const browRatio = eyebrowDist / Math.max(0.01, eyeDist);
+
+      let detectedExpr = 'normal';
+
+      if (openRatio > 0.35) {
+        // Grimacing or screaming
+        detectedExpr = 'sick';
+      } else if (browRatio < 0.42) {
+        // Brow furrowing
+        detectedExpr = 'angry';
+      } else if (smileValue > 0.01) {
+        // Upward mouth corners
+        detectedExpr = 'happy';
+      } else if (smileValue < -0.015) {
+        // Downward mouth corners
+        detectedExpr = 'sad';
+      }
+
+      activeExpression = detectedExpr;
+      lastExpressionTime = Date.now();
+    }
+
+    function applyFiltersAndRender() {
+      outCtx.clearRect(0, 0, outCanvas.width, outCanvas.height);
+
+      // Save mirrored feed to pipeline canvas
+      procCtx.clearRect(0, 0, renderW, renderH);
+      procCtx.save();
+      procCtx.translate(renderW, 0);
+      procCtx.scale(-1, 1);
+      procCtx.drawImage(video, 0, 0, renderW, renderH);
+      procCtx.restore();
+
+      // Clear Legend Highlights
+      document.querySelectorAll('[id^="legend-"]').forEach(el => {
+        el.className = "flex flex-col items-center py-0.5 rounded border border-transparent transition-colors text-neutral-400";
+      });
+
+      // 1. Draw Underlay Feed with respective hand filters
+      switch (activeGesture) {
+        case 'fist':
+          applyDitherFilter();
+          break;
+        case 'peace':
+          applyVhsFilter();
+          break;
+        case 'point':
+          applySpotlightFilter();
+          break;
+        case 'open':
+          applyRippleFilter();
+          break;
+        default:
+          outCtx.drawImage(procCanvas, 0, 0, outCanvas.width, outCanvas.height);
+      }
+
+      // Update Hand filter labels
+      if (activeGesture === 'none') {
+        activeFilterName.textContent = "None";
+        activeFilterName.className = "text-xs font-bold text-neutral-400";
+      } else if (activeGesture === 'heart') {
+        activeFilterName.textContent = "Spawning Hearts";
+        activeFilterName.className = "text-xs font-bold text-pink-400";
+        highlightLegend('heart', 'border-pink-500 bg-pink-950/40 text-pink-400 col-span-4 mt-0.5');
+      } else if (activeGesture === 'ok') {
+        activeFilterName.textContent = "Spawning Bubbles";
+        activeFilterName.className = "text-xs font-bold text-emerald-400";
+      } else if (activeGesture === 'thumbs_up') {
+        activeFilterName.textContent = "Pop Active Bubbles";
+        activeFilterName.className = "text-xs font-bold text-amber-400";
+      } else {
+        activeFilterName.textContent = activeGesture.toUpperCase();
+        activeFilterName.className = "text-xs font-bold text-neutral-200";
+      }
+
+      // 2. Apply Full-Screen Face Color Tint Overlay
+      applyExpressionTint();
+
+      // 3. Render Particles Engine
+      updateAndDrawBubbles(outCtx);
+      updateAndDrawHearts(outCtx);
+
+      // 4. Index Fingertip Tracking Indicator
+      if (indexFingerPos.visible && activeGesture !== 'heart') {
+        outCtx.save();
+        outCtx.shadowColor = "rgba(255, 255, 255, 0.8)";
+        outCtx.shadowBlur = 12;
+        outCtx.beginPath();
+        outCtx.arc(indexFingerPos.x, indexFingerPos.y, 8, 0, Math.PI * 2);
+        outCtx.fillStyle = '#FFFFFF';
+        outCtx.fill();
+        outCtx.restore();
+      }
+    }
+
+    function applyExpressionTint() {
+      outCtx.save();
+
+      switch (activeExpression) {
+        case 'sad':
+          outCtx.fillStyle = 'rgba(0, 100, 255, 0.22)';
+          outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+          activeExpressionName.textContent = "Sad";
+          activeExpressionName.className = "text-xs font-bold text-blue-400";
+          highlightLegend('sad', 'border-blue-500 bg-blue-950/40 text-blue-400');
+          break;
+        case 'angry':
+          outCtx.fillStyle = 'rgba(255, 0, 0, 0.22)';
+          outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+          activeExpressionName.textContent = "Angry";
+          activeExpressionName.className = "text-xs font-bold text-red-400";
+          highlightLegend('angry', 'border-red-500 bg-red-950/40 text-red-400');
+          break;
+        case 'happy':
+          outCtx.fillStyle = 'rgba(255, 105, 180, 0.25)';
+          outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+          activeExpressionName.textContent = "Happy";
+          activeExpressionName.className = "text-xs font-bold text-pink-400";
+          highlightLegend('happy', 'border-pink-500 bg-pink-950/40 text-pink-400');
+          break;
+        case 'sick':
+          outCtx.fillStyle = 'rgba(0, 200, 100, 0.22)';
+          outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+          activeExpressionName.textContent = "Sick";
+          activeExpressionName.className = "text-xs font-bold text-green-400";
+          highlightLegend('sick', 'border-green-500 bg-green-950/40 text-green-400');
+          break;
+        default:
+          activeExpressionName.textContent = "Neutral";
+          activeExpressionName.className = "text-xs font-bold text-neutral-400";
+      }
+
+      outCtx.restore();
+    }
+
+    function highlightLegend(id, classes) {
+      const activeEl = document.getElementById(`legend-${id}`);
+      if (activeEl) {
+        activeEl.className = `flex flex-col items-center py-0.5 rounded border text-[9px] ${classes}`;
+      }
+    }
+
+    // Floating Hearts Logic Engine
+    function updateAndDrawHearts(ctx) {
+      const now = Date.now();
+
+      if (activeGesture === 'heart' && heartSpawnPos.active) {
+        if (now - lastHeartSpawnTime > SPAWN_COOLDOWN) {
+          hearts.push({
+            x: heartSpawnPos.x + (Math.random() - 0.5) * 40,
+            y: heartSpawnPos.y,
+            size: 15 + Math.random() * 15,
+            vy: 1.5 + Math.random() * 2,
+            wobbleSpeed: 0.03 + Math.random() * 0.02,
+            wobbleOffset: Math.random() * Math.PI * 2,
+            alpha: 1.0
+          });
+          lastHeartSpawnTime = now;
+        }
+      }
+
+      for (let i = hearts.length - 1; i >= 0; i--) {
+        const h = hearts[i];
+
+        h.y -= h.vy;
+        h.x += Math.sin(h.y * h.wobbleSpeed + h.wobbleOffset) * 0.8;
+        h.alpha -= 0.01;
+
+        if (h.alpha <= 0 || h.y < -h.size) {
+          hearts.splice(i, 1);
+          continue;
+        }
+
+        // Draw Vector Heart
+        ctx.save();
+        ctx.globalAlpha = h.alpha;
+        ctx.fillStyle = '#FF2E93';
+
+        ctx.shadowColor = 'rgba(255, 46, 147, 0.4)';
+        ctx.shadowBlur = 8;
+
+        ctx.beginPath();
+        ctx.moveTo(h.x, h.y - h.size / 4);
+        ctx.bezierCurveTo(h.x, h.y - h.size / 2, h.x - h.size / 2, h.y - h.size / 2, h.x - h.size / 2, h.y - h.size / 4);
+        ctx.bezierCurveTo(h.x - h.size / 2, h.y + h.size / 8, h.x, h.y + h.size / 2, h.x, h.y + h.size / 2);
+        ctx.bezierCurveTo(h.x, h.y + h.size / 2, h.x + h.size / 2, h.y + h.size / 8, h.x + h.size / 2, h.y - h.size / 4);
+        ctx.bezierCurveTo(h.x + h.size / 2, h.y - h.size / 2, h.x, h.y - h.size / 2, h.x, h.y - h.size / 4);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // Bubbles Engine
+    function updateAndDrawBubbles(ctx) {
+      const now = Date.now();
+
+      if (activeGesture === 'ok' && indexFingerPos.visible) {
+        if (now - lastBubbleSpawnTime > SPAWN_COOLDOWN) {
+          bubbles.push({
+            x: indexFingerPos.x,
+            y: indexFingerPos.y,
+            radius: 12 + Math.random() * 14,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: 1.2 + Math.random() * 1.8,
+            wobbleSpeed: 0.02 + Math.random() * 0.03,
+            wobbleOffset: Math.random() * Math.PI * 2,
+            popping: false,
+            popProgress: 0
+          });
+          lastBubbleSpawnTime = now;
+        }
+      }
+
+      if (activeGesture === 'thumbs_up') {
+        bubbles.forEach(b => {
+          if (!b.popping) b.popping = true;
+        });
+      }
+
+      for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+
+        if (b.popping) {
+          b.popProgress += 0.15;
+          if (b.popProgress >= 1) {
+            bubbles.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, b.radius * (1 + b.popProgress * 0.6), 0, Math.PI * 2);
+          ctx.strokeStyle = `rgba(255, 255, 255, ${1 - b.popProgress})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.restore();
+          continue;
+        }
+
+        b.y -= b.vy;
+        b.x += b.vx + Math.sin(b.y * b.wobbleSpeed + b.wobbleOffset) * 0.6;
+
+        if (b.y < -b.radius) {
+          bubbles.splice(i, 1);
+          continue;
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+
+        const grad = ctx.createRadialGradient(
+          b.x - b.radius * 0.3, b.y - b.radius * 0.3, b.radius * 0.1,
+          b.x, b.y, b.radius
+        );
+        grad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+        grad.addColorStop(0.6, 'rgba(173, 216, 230, 0.15)');
+        grad.addColorStop(0.9, 'rgba(238, 130, 238, 0.25)');
+        grad.addColorStop(1, 'rgba(255, 255, 255, 0.55)');
+
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.45)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(b.x - b.radius * 0.35, b.y - b.radius * 0.35, b.radius * 0.18, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function applyDitherFilter() {
+      const imgData = procCtx.getImageData(0, 0, renderW, renderH);
+      const data = imgData.data;
+
+      const bayerMatrix = [
+        [ 51, 153],
+        [204, 102]
+      ];
+
+      for (let y = 0; y < renderH; y++) {
+        for (let x = 0; x < renderW; x++) {
+          const idx = (y * renderW + x) * 4;
+          const gray = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+
+          const mx = x % 2;
+          const my = y % 2;
+          const threshold = bayerMatrix[my][mx];
+
+          const val = gray > threshold ? 255 : 0;
+          data[idx] = val;
+          data[idx + 1] = val;
+          data[idx + 2] = val;
+        }
+      }
+
+      procCtx.putImageData(imgData, 0, 0);
+      outCtx.drawImage(procCanvas, 0, 0, outCanvas.width, outCanvas.height);
+    }
+
+    function applyVhsFilter() {
+      rCtx.clearRect(0, 0, renderW, renderH);
+      gCtx.clearRect(0, 0, renderW, renderH);
+      bCtx.clearRect(0, 0, renderW, renderH);
+
+      rCtx.drawImage(procCanvas, 0, 0);
+      rCtx.globalCompositeOperation = 'multiply';
+      rCtx.fillStyle = '#FF0000';
+      rCtx.fillRect(0, 0, renderW, renderH);
+      rCtx.globalCompositeOperation = 'source-over';
+
+      gCtx.drawImage(procCanvas, 0, 0);
+      gCtx.globalCompositeOperation = 'multiply';
+      gCtx.fillStyle = '#00FF00';
+      gCtx.fillRect(0, 0, renderW, renderH);
+      gCtx.globalCompositeOperation = 'source-over';
+
+      bCtx.drawImage(procCanvas, 0, 0);
+      bCtx.globalCompositeOperation = 'multiply';
+      bCtx.fillStyle = '#0000FF';
+      bCtx.fillRect(0, 0, renderH, renderH);
+      bCtx.globalCompositeOperation = 'source-over';
+
+      outCtx.save();
+      outCtx.globalCompositeOperation = 'screen';
+
+      const shift = 6 + Math.sin(Date.now() / 80) * 3;
+
+      outCtx.drawImage(rChan, -shift, 0, outCanvas.width + shift, outCanvas.height);
+      outCtx.drawImage(gChan, 0, 0, outCanvas.width, outCanvas.height);
+      outCtx.drawImage(bChan, shift, 0, outCanvas.width - shift, outCanvas.height);
+      outCtx.restore();
+
+      outCtx.save();
+      outCtx.fillStyle = "rgba(0, 0, 0, 0.15)";
+      for (let i = 0; i < outCanvas.height; i += 4) {
+        outCtx.fillRect(0, i, outCanvas.width, 1.5);
+      }
+
+      const noiseY = (Date.now() / 6) % (outCanvas.height + 200) - 100;
+      outCtx.fillStyle = "rgba(255, 255, 255, 0.12)";
+      outCtx.fillRect(0, noiseY, outCanvas.width, 30);
+      outCtx.restore();
+    }
+
+    function applySpotlightFilter() {
+      const targetX = indexFingerPos.visible ? indexFingerPos.x : outCanvas.width / 2;
+      const targetY = indexFingerPos.visible ? indexFingerPos.y : outCanvas.height / 2;
+
+      outCtx.drawImage(procCanvas, 0, 0, outCanvas.width, outCanvas.height);
+
+      outCtx.save();
+      const radius = Math.min(outCanvas.width, outCanvas.height) * 0.4;
+      const gradient = outCtx.createRadialGradient(
+        targetX, targetY, 20,
+        targetX, targetY, radius
+      );
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.95)');
+
+      outCtx.fillStyle = gradient;
+      outCtx.fillRect(0, 0, outCanvas.width, outCanvas.height);
+      outCtx.restore();
+    }
+
+    function applyRippleFilter() {
+      waterRippleOffset += 0.25;
+      const sliceHeight = 4;
+      const maxDisplacement = 12;
+
+      for (let y = 0; y < outCanvas.height; y += sliceHeight) {
+        const waveIndex = (y / outCanvas.height) * Math.PI * 6;
+        const shift = Math.sin(waveIndex + waterRippleOffset) * maxDisplacement;
+
+        outCtx.drawImage(
+          procCanvas,
+          0, (y / outCanvas.height) * renderH,
+          renderW, (sliceHeight / outCanvas.height) * renderH,
+          shift, y,
+          outCanvas.width, sliceHeight
+        );
+      }
+    }
+
+    function calculateFPS() {
+      frameCount++;
+      const now = Date.now();
+      if (now - lastFpsUpdateTime >= 1000) {
+        fpsCounter.textContent = frameCount;
+        frameCount = 0;
+        lastFpsUpdateTime = now;
+      }
+    }
+
+    window.onload = function() {
+      initModels();
+      initCamera();
+    };
+  </script>
+</body>
+</html>
