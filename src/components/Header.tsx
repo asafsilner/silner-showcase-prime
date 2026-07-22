@@ -62,6 +62,12 @@ const Header = () => {
                     >
                       AI Advisor
                     </Link>
+                    <Link
+                      to="/character-studio"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors gold-underline"
+                    >
+                      Character Studio
+                    </Link>
                     <button
                       onClick={() => scrollToSection("hero")}
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors gold-underline"
@@ -88,6 +94,12 @@ const Header = () => {
                       className="text-sm text-muted-foreground hover:text-foreground transition-colors gold-underline"
                     >
                       AI Advisor
+                    </Link>
+                    <Link
+                      to="/character-studio"
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors gold-underline"
+                    >
+                      Character Studio
                     </Link>
                     <a
                       href="mailto:asafsilner@gmail.com"
