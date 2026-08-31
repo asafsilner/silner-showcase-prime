@@ -709,6 +709,39 @@ export const projectsData: Project[] = [
   },
 ];
 
+  {
+    id: "claude-desktop-rtl",
+    title: "Claude Desktop RTL Patch",
+    tagline: "Open-source Windows patch adding real-time right-to-left language support for Hebrew and Arabic in Claude Desktop.",
+    role: "Open Source Contributor",
+    team: "Open Source / Community",
+    duration: "Ongoing",
+    platform: "Windows (Electron / Claude Desktop)",
+    tools: ["PowerShell", "JavaScript", "Node.js", "Electron / ASAR", "RSA-4096 Cryptography"],
+    media: {
+      thumbnail: "/placeholder.svg",
+      hero: "/placeholder.svg",
+      video: "",
+      videos: [],
+      gallery: [],
+    },
+    responsibilities: [
+      "Designed a cryptographically signed installation pipeline using RSA-4096 to prevent supply-chain attacks.",
+      "Built a pure DOM-free RTL/LaTeX detection engine covering Hebrew, Arabic, Syriac, and a dozen historic scripts.",
+      "Implemented ASAR archive injection that preserves code blocks, LaTeX formulas, and tables in LTR orientation.",
+      "Added automatic backup and one-click restoration for all modified binary files.",
+    ],
+    content: {
+      problem: "Claude Desktop has no native RTL support, making Hebrew and Arabic text display left-to-right — unreadable for millions of speakers of those languages.",
+      solution: "A three-phase Windows patch: extract Claude's Electron ASAR archive and inject RTL detection logic, update the embedded SHA-256 hash in the executable, and replace the bundled certificate so the patched binary passes integrity checks. All changes are backed up and reversible.",
+      coreLoop: "Detect RTL Characters -> Assign dir attribute -> Preserve Code/LaTeX Blocks -> Maintain Mixed-Direction Flow",
+      systems: "Security: RSA-4096 signed installer prevents TOCTOU attacks. RTL engine: Unicode block ranges covering 10+ scripts. Persistence: optional auto-updater re-patches after Claude updates.",
+      uxFlow: "Run Installer -> Signature Verification -> Interactive Menu -> ASAR Inject -> Hash Patch -> Certificate Patch -> Launch Claude Desktop.",
+      outcome: "Enables natural Hebrew and Arabic conversations in Claude Desktop on Windows, with smart handling for mixed-direction content, code blocks, and mathematical notation.",
+    },
+  },
+];
+
 export const getProjectById = (id: string): Project | undefined => {
   return projectsData.find((project) => project.id === id);
 };
