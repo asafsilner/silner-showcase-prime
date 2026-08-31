@@ -1,0 +1,2 @@
+description = "Show ponytail's measured impact scoreboard (less code, cost, time)"
+prompt = "Display the ponytail benchmark gains scoreboard as ASCII bars. Show benchmark medians across five everyday tasks (add feature, fix bug, write test, refactor, explain code) for three Claude models. Metrics: lines of code (ponytail: 6-20% of baseline), cost (23-53% of baseline), speed (3-6x faster). Do not report per-repository savings — no baseline exists here. For actual repo data, run /ponytail-audit or /ponytail-debt. Source: DietrichGebert/ponytail benchmarks."

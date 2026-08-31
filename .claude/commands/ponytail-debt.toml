@@ -1,0 +1,2 @@
+description = "Harvest ponytail: comment markers into a tracked debt ledger"
+prompt = "Grep the whole tree for comment markers (grep -rnE '(#|//) ?ponytail:' . skipping node_modules/.git/build output). For each hit output: <file>:<line> — <simplified approach> | ceiling: <named limit> | upgrade: <trigger>. Flag entries missing an upgrade path as 'no-trigger' — these rot silently. End with: total markers found, count lacking triggers. If none: 'No ponytail: debt. Clean ledger.'"
