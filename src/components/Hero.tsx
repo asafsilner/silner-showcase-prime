@@ -105,7 +105,7 @@ const Hero = () => {
             </Button>
             
             <Button asChild variant="outline" size="lg" className="border-border hover:border-primary hover:text-primary px-6 py-6 text-base">
-              <a href="https://linkedin.com/in/asafsilner" target="_blank" rel="noopener noreferrer">
+              <a href="https://lnkd.in/dN6GZ2cw" target="_blank" rel="noopener noreferrer">
                 <Linkedin className="mr-2 w-4 h-4" />
                 LinkedIn
               </a>
