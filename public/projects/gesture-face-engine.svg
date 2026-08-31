@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 533" width="800" height="533">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1a0a2e"/>
+      <stop offset="100%" stop-color="#0a0a0a"/>
+    </radialGradient>
+    <radialGradient id="glow-pink" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff2e93" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#ff2e93" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow-blue" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0064ff" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#0064ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="blur-soft">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="533" fill="url(#bg)"/>
+
+  <!-- Ambient glow spots -->
+  <ellipse cx="200" cy="280" rx="180" ry="140" fill="url(#glow-blue)" filter="url(#blur-soft)"/>
+  <ellipse cx="580" cy="220" rx="160" ry="120" fill="url(#glow-pink)" filter="url(#blur-soft)"/>
+
+  <!-- Camera viewfinder frame -->
+  <rect x="120" y="80" width="560" height="380" rx="12" fill="none" stroke="#333" stroke-width="1.5"/>
+
+  <!-- Corner brackets -->
+  <path d="M120,110 L120,80 L150,80" fill="none" stroke="#e0a020" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M650,80 L680,80 L680,110" fill="none" stroke="#e0a020" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M120,430 L120,460 L150,460" fill="none" stroke="#e0a020" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M650,460 L680,460 L680,430" fill="none" stroke="#e0a020" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Face mesh dots (simplified) -->
+  <!-- Oval face outline dots -->
+  <g opacity="0.5" fill="#a78bfa">
+    <circle cx="400" cy="155" r="2"/>
+    <circle cx="360" cy="162" r="1.5"/>
+    <circle cx="440" cy="162" r="1.5"/>
+    <circle cx="330" cy="185" r="1.5"/>
+    <circle cx="470" cy="185" r="1.5"/>
+    <circle cx="315" cy="215" r="1.5"/>
+    <circle cx="485" cy="215" r="1.5"/>
+    <circle cx="310" cy="250" r="1.5"/>
+    <circle cx="490" cy="250" r="1.5"/>
+    <circle cx="315" cy="285" r="1.5"/>
+    <circle cx="485" cy="285" r="1.5"/>
+    <circle cx="330" cy="315" r="1.5"/>
+    <circle cx="470" cy="315" r="1.5"/>
+    <circle cx="355" cy="340" r="1.5"/>
+    <circle cx="445" cy="340" r="1.5"/>
+    <circle cx="400" cy="348" r="2"/>
+    <!-- Eyes -->
+    <circle cx="360" cy="220" r="2.5" fill="#a78bfa"/>
+    <circle cx="440" cy="220" r="2.5" fill="#a78bfa"/>
+    <!-- Mouth curve -->
+    <circle cx="370" cy="305" r="2"/>
+    <circle cx="385" cy="312" r="2"/>
+    <circle cx="400" cy="315" r="2"/>
+    <circle cx="415" cy="312" r="2"/>
+    <circle cx="430" cy="305" r="2"/>
+  </g>
+
+  <!-- Face mesh connecting lines (very faint) -->
+  <g opacity="0.15" stroke="#a78bfa" stroke-width="0.8" fill="none">
+    <path d="M360,162 L330,185 L315,215 L310,250 L315,285 L330,315 L355,340 L400,348 L445,340 L470,315 L485,285 L490,250 L485,215 L470,185 L440,162 L400,155 Z"/>
+  </g>
+
+  <!-- Hand skeleton - left side -->
+  <g opacity="0.7" filter="url(#glow)">
+    <!-- Palm -->
+    <line x1="195" y1="350" x2="185" y2="290" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <!-- Index finger -->
+    <line x1="185" y1="290" x2="178" y2="255" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="178" y1="255" x2="172" y2="225" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="172" y1="225" x2="168" y2="200" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <!-- Middle finger -->
+    <line x1="195" y1="285" x2="190" y2="248" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="190" y1="248" x2="186" y2="215" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="186" y1="215" x2="183" y2="185" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <!-- Thumb -->
+    <line x1="210" y1="310" x2="228" y2="288" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="228" y1="288" x2="240" y2="265" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <!-- Dots at joints -->
+    <circle cx="185" cy="290" r="3" fill="#34d399"/>
+    <circle cx="178" cy="255" r="2.5" fill="#34d399"/>
+    <circle cx="172" cy="225" r="2.5" fill="#34d399"/>
+    <circle cx="168" cy="200" r="3" fill="#10b981"/>
+    <circle cx="183" cy="185" r="3" fill="#10b981"/>
+    <circle cx="240" cy="265" r="3" fill="#10b981"/>
+  </g>
+
+  <!-- Hand skeleton - right side -->
+  <g opacity="0.7" filter="url(#glow)">
+    <!-- Palm -->
+    <line x1="605" y1="350" x2="615" y2="290" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <!-- Index finger -->
+    <line x1="615" y1="290" x2="622" y2="255" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="622" y1="255" x2="628" y2="225" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="628" y1="225" x2="632" y2="200" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <!-- Middle finger -->
+    <line x1="605" y1="285" x2="610" y2="248" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="610" y1="248" x2="614" y2="215" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="614" y1="215" x2="617" y2="185" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <!-- Thumb -->
+    <line x1="590" y1="310" x2="572" y2="288" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <line x1="572" y1="288" x2="560" y2="265" stroke="#34d399" stroke-width="2" stroke-linecap="round"/>
+    <!-- Dots at joints -->
+    <circle cx="615" cy="290" r="3" fill="#34d399"/>
+    <circle cx="622" cy="255" r="2.5" fill="#34d399"/>
+    <circle cx="628" cy="225" r="2.5" fill="#34d399"/>
+    <circle cx="632" cy="200" r="3" fill="#10b981"/>
+    <circle cx="617" cy="185" r="3" fill="#10b981"/>
+    <circle cx="560" cy="265" r="3" fill="#10b981"/>
+  </g>
+
+  <!-- Floating hearts -->
+  <g fill="#ff2e93" opacity="0.9" filter="url(#glow)">
+    <!-- Heart 1 -->
+    <path d="M400,175 C400,165 388,165 388,175 C388,182 400,192 400,192 C400,192 412,182 412,175 C412,165 400,165 400,175 Z" transform="scale(1.4) translate(-86,-40)"/>
+    <!-- Heart 2 smaller -->
+    <path d="M400,175 C400,165 388,165 388,175 C388,182 400,192 400,192 C400,192 412,182 412,175 C412,165 400,165 400,175 Z" transform="scale(0.9) translate(80,-30)" opacity="0.7"/>
+    <!-- Heart 3 tiny -->
+    <path d="M400,175 C400,165 388,165 388,175 C388,182 400,192 400,192 C400,192 412,182 412,175 C412,165 400,165 400,175 Z" transform="scale(0.6) translate(-30,40)" opacity="0.5"/>
+  </g>
+
+  <!-- Expression tint indicator bars -->
+  <rect x="140" y="100" width="4" height="340" rx="2" fill="#0064ff" opacity="0.6"/>
+  <rect x="656" y="100" width="4" height="340" rx="2" fill="#ff0000" opacity="0.5"/>
+
+  <!-- Status bar at bottom -->
+  <rect x="120" y="440" width="560" height="20" rx="4" fill="#111" opacity="0.9"/>
+  <rect x="128" y="444" width="8" height="12" rx="2" fill="#22c55e"/>
+  <text x="144" y="454" font-family="monospace" font-size="10" fill="#888">MediaPipe · Face Mesh · Hand Tracking · Canvas2D Filters</text>
+
+  <!-- Title overlay -->
+  <rect x="0" y="460" width="800" height="73" fill="#0a0a0a" opacity="0.95"/>
+  <text x="400" y="492" text-anchor="middle" font-family="system-ui, sans-serif" font-size="22" font-weight="700" fill="#f5f5f5" letter-spacing="0.5">Gesture &amp; Face Filter Engine</text>
+  <text x="400" y="514" text-anchor="middle" font-family="system-ui, sans-serif" font-size="12" fill="#888">Real-time CNN expression recognition · Multi-gesture hand tracking · Live canvas FX</text>
+</svg>
