@@ -1,4 +1,5 @@
 import Hero from "@/components/Hero";
+import Showreel from "@/components/Showreel";
 import WorkGrid from "@/components/WorkGrid";
 import ProjectMatcher from "@/components/ProjectMatcher";
 import { Linkedin, Youtube, Instagram } from "lucide-react";
@@ -18,6 +19,7 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background">
       <Hero />
+      <Showreel />
       <WorkGrid />
       <ProjectMatcher />
       
