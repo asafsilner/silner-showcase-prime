@@ -1,5 +1,6 @@
 import Hero from "@/components/Hero";
 import WorkGrid from "@/components/WorkGrid";
+import ProjectMatcher from "@/components/ProjectMatcher";
 import { Linkedin, Youtube, Instagram } from "lucide-react";
 
 const socialLinks = [
@@ -18,6 +19,7 @@ const Index = () => {
     <main className="min-h-screen bg-background">
       <Hero />
       <WorkGrid />
+      <ProjectMatcher />
       
       {/* Footer */}
       <footer className="py-12 border-t border-border">
