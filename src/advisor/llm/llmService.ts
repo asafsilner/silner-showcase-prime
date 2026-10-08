@@ -10,7 +10,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import type { KnowledgeGraph, PersonaProfile, AdvisorReport, Question } from "../types";
 import { nodesOfKind } from "../agents/researchAgent";
