@@ -10,7 +10,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import type { KnowledgeGraph, PersonaProfile, AdvisorReport, Question } from "../types";
 import { nodesOfKind } from "../agents/researchAgent";
@@ -154,7 +154,9 @@ ${question.options ? `(לשאלה יש אפשרויות בחירה קבועות 
         },
       ],
     });
-    return response.parsed_output ?? null;
+    const parsed = response.parsed_output;
+    if (!parsed) return null;
+    return { text: parsed.text, hint: parsed.hint ?? null };
   } catch (error) {
     console.warn("[advisor] LLM question phrasing failed, using rule-based text:", error);
     return null;
